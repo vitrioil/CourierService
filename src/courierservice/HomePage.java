@@ -21,11 +21,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextField;
+import static java.util.Collections.list;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.ToggleGroup;
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -143,9 +150,29 @@ public class HomePage extends Application {
         GridPane gPane = sampleGridPane();
         gPane.getStyleClass().add("grid-pane");
 
-        VBox vBox = new VBox(5);
+        ObservableList<Order> wordsList = FXCollections.observableArrayList();
+        wordsList.add(new Order("First Word", "123456789"));
+        wordsList.add(new Order("Second Word", "123456789"));
+        wordsList.add(new Order("Third Word", "123456789"));
+        ListView<Order> list = new ListView<>(wordsList);
+        list.setCellFactory(param -> new ListCell<Order>() {
+            @Override
+            protected void updateItem(Order item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null || item.getOrderRepresentation() == null) {
+                    setText(null);
+                } else {
+                    setText(item.getOrderRepresentation());
+                }
+            }
+        });
+        list.setPrefSize(500, 200);
         
-        gPane.getChildren().addAll(vBox);
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(list);
+        
+        gPane.getChildren().addAll(list);
 
         history.setContent(gPane);
     }
@@ -163,6 +190,7 @@ public class HomePage extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        BorderPane borderPane = new BorderPane();
         
         newOrder = new Tab("New Order");
         history = new Tab("History");
@@ -172,12 +200,24 @@ public class HomePage extends Application {
         historyTabScene();
         trackingTabScene();
         
-
         TabPane tabPane = new TabPane();
-        snackbar = new JFXSnackbar();
-        
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         
+        String RIGHT="Settings";
+        FlowPane content = new FlowPane();
+        JFXButton settingsButton = new JFXButton(RIGHT);
+        content.getChildren().addAll(settingsButton);
+        content.setMaxSize(200, 200);
+
+        AnchorPane anchor = new AnchorPane();
+        anchor.getChildren().addAll(tabPane);//, settingsButton);
+        AnchorPane.setTopAnchor(settingsButton, 3.0);
+        AnchorPane.setRightAnchor(settingsButton, 5.0);
+        AnchorPane.setTopAnchor(tabPane, 1.0);
+        AnchorPane.setRightAnchor(tabPane, 1.0);
+        AnchorPane.setLeftAnchor(tabPane, 1.0);
+        AnchorPane.setBottomAnchor(tabPane, 1.0);
+
         tabPane.getTabs().addAll(newOrder, history, tracking);
         
         tabPane.getSelectionModel().selectedItemProperty().addListener( (ov, oldTab, newTab) -> {
@@ -186,15 +226,12 @@ public class HomePage extends Application {
         });
            
         
-        String RIGHT="Settings";
-        FlowPane content = new FlowPane();
-        JFXButton rightButton = new JFXButton(RIGHT);
-        content.getChildren().addAll(rightButton);
-        content.setMaxSize(200, 200);
-
         JFXDrawer rightDrawer = new JFXDrawer();
         StackPane rightDrawerPane = new StackPane();
         rightDrawerPane.getStyleClass().add("blue-400");
+        //Setting drawer pane
+        
+        
         rightDrawerPane.getChildren().add(new JFXButton("Right Content"));
         rightDrawer.setDirection(DrawerDirection.RIGHT);
         rightDrawer.setDefaultDrawerSize(150);
@@ -207,12 +244,11 @@ public class HomePage extends Application {
 
         rightDrawer.setId(RIGHT);
         
-        rightButton.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
+        settingsButton.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
 
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(tabPane, drawersStack);
-
-        Scene scene = new Scene(vBox, 500, 500);
+        borderPane.setCenter(anchor);
+        borderPane.setTop(drawersStack);
+        Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);
