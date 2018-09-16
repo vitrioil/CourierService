@@ -140,3 +140,6 @@
 .jfx-rippler {
     -jfx-rippler-fill: red;
 }
+.jfx-popup .jfx-list-view{
+    -fx-background-color: black;
+}

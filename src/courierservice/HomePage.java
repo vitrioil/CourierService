@@ -9,6 +9,9 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
+import com.jfoenix.controls.JFXPopup;
+import com.jfoenix.controls.JFXPopup.PopupHPosition;
+import com.jfoenix.controls.JFXPopup.PopupVPosition;
 import com.jfoenix.controls.JFXRadioButton;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -21,7 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextField;
-import static java.util.Collections.list;
+import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
@@ -145,34 +148,90 @@ public class HomePage extends Application {
         newOrder.setContent(gridPane);
     }
     
+    public GridPane getOrderDetails(Order orderSelected, JFXButton showDetails)
+    {
+        
+        GridPane gridOrderDetails = new GridPane();
+        
+        HashMap<String, Label> orderDetails = orderSelected.getDetails();
+        
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        
+        //Setting drawer pane
+        
+        for (HashMap.Entry< String,Label> m:orderDetails.entrySet())
+        {
+           vBox.getChildren().add(m.getValue());
+        }
+        
+        
+       
+        gridOrderDetails.getChildren().addAll(vBox);
+        return gridOrderDetails;
+    }
+    
     public void historyTabScene()
     {
         GridPane gPane = sampleGridPane();
         gPane.getStyleClass().add("grid-pane");
 
-        ObservableList<Order> wordsList = FXCollections.observableArrayList();
-        wordsList.add(new Order("First Word", "123456789"));
-        wordsList.add(new Order("Second Word", "123456789"));
-        wordsList.add(new Order("Third Word", "123456789"));
-        ListView<Order> list = new ListView<>(wordsList);
-        list.setCellFactory(param -> new ListCell<Order>() {
+        Label labelHistory = new Label("Check your history of couriers here!");
+        
+        ObservableList<Order> orderList = FXCollections.observableArrayList();
+        orderList.add(new Order("Phone", "123456789", "1", 1, 2));
+        orderList.add(new Order("Letter", "123456789", "2", 1, 3));
+        orderList.add(new Order("Document", "123456789", "3", 2, 1));
+        ListView<Order> listViewOrder = new ListView<Order>(orderList);
+        listViewOrder.setCellFactory(param -> new ListCell<Order>() {
             @Override
             protected void updateItem(Order item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (empty || item == null || item.getOrderRepresentation() == null) {
+                if (empty || item == null || item.getName() == null) {
                     setText(null);
                 } else {
-                    setText(item.getOrderRepresentation());
+                    setText(item.getName());
                 }
             }
         });
-        list.setPrefSize(500, 200);
+        listViewOrder.setPrefSize(500, 200);
+
+        JFXButton buttonGetDetails = new JFXButton("Find");        
         
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(list);
+        FlowPane content = new FlowPane();
+        content.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails);
+        content.setMaxSize(200, 200);
         
-        gPane.getChildren().addAll(list);
+        JFXDrawer rightDrawer = new JFXDrawer();
+        StackPane rightDrawerPane = new StackPane();
+        rightDrawerPane.getStyleClass().add("blue-400");
+        
+        rightDrawer.setDirection(DrawerDirection.RIGHT);
+        rightDrawer.setDefaultDrawerSize(150);
+        rightDrawer.setSidePane(rightDrawerPane);
+        rightDrawer.setOverLayVisible(false);
+        rightDrawer.setResizableOnDrag(true);
+
+        JFXDrawersStack drawersStack = new JFXDrawersStack();
+        drawersStack.setContent(content);
+
+        
+        buttonGetDetails.setOnAction(e -> {
+            System.out.println("Getting the order details");
+            Order orderSelected = listViewOrder.getSelectionModel().getSelectedItem();
+            GridPane gridShowOrderDetail = getOrderDetails(orderSelected, buttonGetDetails);
+            
+            rightDrawerPane.getChildren().removeAll();
+            rightDrawerPane.getChildren().add(gridShowOrderDetail);
+            drawersStack.toggle(rightDrawer);
+//            JFXPopup popup = new JFXPopup(gridShowOrderDetail); 
+//           popup.setPrefHeight(100);
+//            popup.show(buttonGetDetails, PopupVPosition.TOP, PopupHPosition.LEFT);
+        });
+        
+        
+        gPane.getChildren().addAll(drawersStack);
 
         history.setContent(gPane);
     }
@@ -247,7 +306,6 @@ public class HomePage extends Application {
         settingsButton.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
 
         borderPane.setCenter(anchor);
-        borderPane.setTop(drawersStack);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
