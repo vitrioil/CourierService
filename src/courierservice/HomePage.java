@@ -9,9 +9,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
-import com.jfoenix.controls.JFXPopup;
-import com.jfoenix.controls.JFXPopup.PopupHPosition;
-import com.jfoenix.controls.JFXPopup.PopupVPosition;
 import com.jfoenix.controls.JFXRadioButton;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -23,18 +20,19 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.jfoenix.controls.JFXSnackbar;
+import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
-import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -88,6 +86,16 @@ public class HomePage extends Application {
         textFieldDestinationAddress.setPromptText("Destination Address");
         textFieldDestinationAddress.setPrefWidth(500);
         
+        JFXTextField textFieldSourceAddress = new JFXTextField();
+        textFieldSourceAddress.setPromptText("Source Address");
+        textFieldSourceAddress.setPrefWidth(500);
+        textFieldSourceAddress.setVisible(false);
+        
+        CheckBox checkBoxEnableSourceAddress = new CheckBox("Use different source address");
+        checkBoxEnableSourceAddress.setOnAction(e -> {
+            textFieldSourceAddress.setVisible(!textFieldSourceAddress.isVisible());
+        });
+        
         
         //Add type of package
         Label labelTypePackage = new Label("Type of package: ");
@@ -109,7 +117,9 @@ public class HomePage extends Application {
         
         
         HBox hBoxRadioButtonsTypePackage = new HBox();
-        hBoxRadioButtonsTypePackage.getChildren().addAll(radioFragileTypePackage, radioDurableTypePackage, radioOtherTypePackage);
+        hBoxRadioButtonsTypePackage.getChildren().addAll(radioFragileTypePackage, 
+                                                         radioDurableTypePackage,  
+                                                         radioOtherTypePackage);
         
         
         //Add type of delivery
@@ -131,17 +141,32 @@ public class HomePage extends Application {
         radioNormalTypeDelivery.setSelected(true);
 
         HBox hBoxRadioButtonsTypeDelivery = new HBox();
-        hBoxRadioButtonsTypeDelivery.getChildren().addAll(radioNextDayTypeDelivery, radioSpeedTypeDelivery, radioNormalTypeDelivery);
+        hBoxRadioButtonsTypeDelivery.getChildren().addAll(radioNextDayTypeDelivery,
+                                                          radioSpeedTypeDelivery,
+                                                          radioNormalTypeDelivery);
+        
+        
+        JFXTextArea textAreaOtherDetails = new JFXTextArea();
+        textAreaOtherDetails.setPromptText("Any other details");
+        textAreaOtherDetails.setPrefSize(500, 50);
+        int intMaxCharLimit = 200;
+        textAreaOtherDetails.setTextFormatter(new TextFormatter<String>(change -> 
+            change.getControlNewText().length() <= intMaxCharLimit ? change : null));
+
+
         
         //Add everything to grid
         VBox vBox = new VBox(5);
         vBox.setSpacing(10);
         vBox.getChildren().addAll(
-                textFieldDestinationAddress, 
+                textFieldDestinationAddress,
+                textFieldSourceAddress,
+                checkBoxEnableSourceAddress,
                 labelTypePackage, 
                 hBoxRadioButtonsTypePackage,
                 labelTypeDelivery,
-                hBoxRadioButtonsTypeDelivery
+                hBoxRadioButtonsTypeDelivery,
+                textAreaOtherDetails
                 );
         
         gridPane.getChildren().addAll(vBox);
@@ -156,17 +181,12 @@ public class HomePage extends Application {
         HashMap<String, Label> orderDetails = orderSelected.getDetails();
         
         VBox vBox = new VBox();
-        vBox.setSpacing(10);
-        
-        //Setting drawer pane
         
         for (HashMap.Entry< String,Label> m:orderDetails.entrySet())
         {
            vBox.getChildren().add(m.getValue());
         }
         
-        
-       
         gridOrderDetails.getChildren().addAll(vBox);
         return gridOrderDetails;
     }
@@ -183,6 +203,8 @@ public class HomePage extends Application {
         orderList.add(new Order("Letter", "123456789", "2", 1, 3));
         orderList.add(new Order("Document", "123456789", "3", 2, 1));
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
+        listViewOrder.getSelectionModel().select(0);
+        
         listViewOrder.setCellFactory(param -> new ListCell<Order>() {
             @Override
             protected void updateItem(Order item, boolean empty) {
@@ -199,22 +221,24 @@ public class HomePage extends Application {
 
         JFXButton buttonGetDetails = new JFXButton("Find");        
         
-        FlowPane content = new FlowPane();
-        content.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails);
-        content.setMaxSize(200, 200);
+        FlowPane flowPane = new FlowPane();
+        flowPane.setHgap(10);
+        
+        flowPane.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails);
+        flowPane.setMaxSize(200, 200);
         
         JFXDrawer rightDrawer = new JFXDrawer();
         StackPane rightDrawerPane = new StackPane();
         rightDrawerPane.getStyleClass().add("blue-400");
         
         rightDrawer.setDirection(DrawerDirection.RIGHT);
-        rightDrawer.setDefaultDrawerSize(150);
+        rightDrawer.setDefaultDrawerSize(200);
         rightDrawer.setSidePane(rightDrawerPane);
         rightDrawer.setOverLayVisible(false);
         rightDrawer.setResizableOnDrag(true);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
-        drawersStack.setContent(content);
+        drawersStack.setContent(flowPane);
 
         
         buttonGetDetails.setOnAction(e -> {
@@ -222,16 +246,22 @@ public class HomePage extends Application {
             Order orderSelected = listViewOrder.getSelectionModel().getSelectedItem();
             GridPane gridShowOrderDetail = getOrderDetails(orderSelected, buttonGetDetails);
             
-            rightDrawerPane.getChildren().removeAll();
+            rightDrawerPane.getChildren().clear();
             rightDrawerPane.getChildren().add(gridShowOrderDetail);
-            drawersStack.toggle(rightDrawer);
+            drawersStack.toggle(rightDrawer, true);
+            
 //            JFXPopup popup = new JFXPopup(gridShowOrderDetail); 
 //           popup.setPrefHeight(100);
 //            popup.show(buttonGetDetails, PopupVPosition.TOP, PopupHPosition.LEFT);
         });
         
         
-        gPane.getChildren().addAll(drawersStack);
+        HBox hBox = new HBox();
+        hBox.setSpacing(10);
+        
+        hBox.getChildren().addAll(drawersStack);
+        
+        gPane.getChildren().addAll(hBox);
 
         history.setContent(gPane);
     }
@@ -262,20 +292,7 @@ public class HomePage extends Application {
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         
-        String RIGHT="Settings";
-        FlowPane content = new FlowPane();
-        JFXButton settingsButton = new JFXButton(RIGHT);
-        content.getChildren().addAll(settingsButton);
-        content.setMaxSize(200, 200);
-
-        AnchorPane anchor = new AnchorPane();
-        anchor.getChildren().addAll(tabPane);//, settingsButton);
-        AnchorPane.setTopAnchor(settingsButton, 3.0);
-        AnchorPane.setRightAnchor(settingsButton, 5.0);
-        AnchorPane.setTopAnchor(tabPane, 1.0);
-        AnchorPane.setRightAnchor(tabPane, 1.0);
-        AnchorPane.setLeftAnchor(tabPane, 1.0);
-        AnchorPane.setBottomAnchor(tabPane, 1.0);
+        
 
         tabPane.getTabs().addAll(newOrder, history, tracking);
         
@@ -285,28 +302,9 @@ public class HomePage extends Application {
         });
            
         
-        JFXDrawer rightDrawer = new JFXDrawer();
-        StackPane rightDrawerPane = new StackPane();
-        rightDrawerPane.getStyleClass().add("blue-400");
-        //Setting drawer pane
+        VBox vBox = new VBox(tabPane);
         
-        
-        rightDrawerPane.getChildren().add(new JFXButton("Right Content"));
-        rightDrawer.setDirection(DrawerDirection.RIGHT);
-        rightDrawer.setDefaultDrawerSize(150);
-        rightDrawer.setSidePane(rightDrawerPane);
-        rightDrawer.setOverLayVisible(false);
-        rightDrawer.setResizableOnDrag(true);
-
-        JFXDrawersStack drawersStack = new JFXDrawersStack();
-        drawersStack.setContent(content);
-
-        rightDrawer.setId(RIGHT);
-        
-        settingsButton.addEventHandler(MOUSE_PRESSED, e -> drawersStack.toggle(rightDrawer));
-
-        borderPane.setCenter(anchor);
-        Scene scene = new Scene(borderPane, 500, 500);
+        Scene scene = new Scene(vBox, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);

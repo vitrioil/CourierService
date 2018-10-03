@@ -7,6 +7,9 @@
     -fx-my-menu-color-highlighted: #455a64;      /* Change according to your needs */
     -fx-my-menu-font-color: #FFFFFF;             /* Change according to your needs */
     -fx-my-menu-font-color-highlighted: #FFFFFF; /* Change according to your needs */
+    -fx-theme-background-color: black;
+    -fx-theme-color: #003333;
+    -fx-prompt-text-color: gray;
 }
 
 /* MENU BAR + Top-level MENU BUTTONS */
@@ -47,7 +50,7 @@
 /* MENU ITEM (children of a MENU BUTTON) */
 /*** The item itself (not hovered / focused) ***/    
 .menu-item {
-    -fx-background-color: -fx-my-menu-color; 
+    -fx-background-color: -fx-my-menu-color;
 }
 
 /*** The item's label (not hovered / focused) ***/   
@@ -75,6 +78,14 @@
 .context-menu {
     -fx-background-color: -fx-my-menu-color; 
 }
+
+
+.jfx-text-field, .jfx-password-field {
+    -fx-prompt-text-fill: -fx-prompt-text-color;
+    -jfx-focus-color: -fx-theme-color;
+    -fx-text-fill: -fx-theme-color;
+}
+
 .tab-pane .tab-header-area .tab-header-background {
     -fx-opacity: 0;
 }
@@ -87,7 +98,7 @@
 {
     -fx-tab-min-width: 200px;
     -fx-tab-min-height: 30px;
-    -fx-background-color: #003333;
+    -fx-background-color: -fx-theme-color;
 }
 
 .tab{
@@ -96,7 +107,7 @@
 }
 .tab-pane .tab
 {
-    -fx-background-color: #003333;
+    -fx-background-color: -fx-theme-color;
 }
 
 .tab-pane .tab:selected
@@ -142,4 +153,81 @@
 }
 .jfx-popup .jfx-list-view{
     -fx-background-color: black;
+}
+
+
+.jfx-drawer-overlay-pane {
+    -fx-background-color: rgba(0.0, 0.0, 0.0, 0.1)
+}
+
+.jfx-drawer-side-pane {
+    -fx-background-color: #000000;
+    -fx-border-width: 1 0 1 1;
+    -fx-border-color: white;
+}
+
+.jfx-button {
+     -jfx-button-type: RAISED;
+     -fx-background-color: black;
+     -fx-border-color: white;
+     -fx-text-fill: white;
+}
+
+.check-box .box {
+
+-fx-background-color: black;
+-fx-border-color: white;
+-fx-border-radius: 1px; 
+
+}
+
+.check-box:selected .mark {
+
+-fx-background-color: black;
+
+}
+
+.check-box:selected .box {
+
+    -fx-background-color: -fx-theme-color;
+}
+
+.jfx-radio-button{
+    -fx-selected-color: -fx-theme-color;
+}
+
+.jfx-text-area {
+    -jfx-focus-color: -fx-theme-color;
+    -jfx-unfocus-color: #4d4d4d;
+    -fx-padding: 0.333333em 0 0 0 ;
+}
+
+.jfx-text-area > .input-line {
+    -fx-background-color: -jfx-unfocus-color;
+    -fx-pref-height: 1px;
+    -fx-translate-y: 1px;
+}
+
+.jfx-text-area > .input-focused-line {
+    -fx-background-color: -jfx-focus-color;
+    -fx-pref-height: 2px;
+}
+
+.jfx-text-area,
+.jfx-text-area:focused {
+    -fx-prompt-text-fill: -fx-prompt-text-color;
+}
+
+.jfx-text-area,
+.jfx-text-area .scroll-pane,
+.jfx-text-area:focused,
+.jfx-text-area:focused .scroll-pane{
+    -fx-background-color: TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT;
+    -fx-text-fill: -fx-theme-color;
+}
+
+.jfx-text-area .content,
+.jfx-text-area:focused .content{
+    -fx-background-color:TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT;
+    -fx-padding: 0 0 0 0;
 }
