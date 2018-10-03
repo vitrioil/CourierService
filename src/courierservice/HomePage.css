@@ -151,6 +151,13 @@
 .jfx-rippler {
     -jfx-rippler-fill: red;
 }
+.jfx-popup-container{
+    -fx-background-color: gray;
+    -fx-text-fill: -fx-theme-color;
+    -fx-border-color: black;
+    -fx-hgap:3;
+    -fx-vgap:5;
+}
 .jfx-popup .jfx-list-view{
     -fx-background-color: black;
 }

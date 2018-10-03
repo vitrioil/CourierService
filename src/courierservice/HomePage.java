@@ -9,6 +9,9 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
+import com.jfoenix.controls.JFXPopup;
+import com.jfoenix.controls.JFXPopup.PopupHPosition;
+import com.jfoenix.controls.JFXPopup.PopupVPosition;
 import com.jfoenix.controls.JFXRadioButton;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -37,6 +40,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 
 
 /**
@@ -75,6 +79,41 @@ public class HomePage extends Application {
         return gridPane;
     }
     
+    public GridPane getGridPaneHelpTypePackage()
+    {
+        GridPane gridPaneHelpTypePackage = new GridPane();
+        Label labelFragile = new Label("Fragile: Increase in cost for padding and protection");
+        Label labelDurable = new Label("Durable: Decrease in cost for reducing padding and protection");
+        Label labelOther = new Label("Other: Normal delivery with sufficient padding and protection");
+        
+        VBox vBoxLabel = new VBox();
+        vBoxLabel.getChildren().addAll(
+                      labelFragile,
+                      labelDurable,
+                      labelOther
+        );
+        gridPaneHelpTypePackage.getChildren().addAll(vBoxLabel);
+        gridPaneHelpTypePackage.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;");
+        return gridPaneHelpTypePackage;
+    }
+    
+    public GridPane getGridPaneHelpTypeDelivery()
+    {
+        GridPane gridPaneHelpTypeDelivery = new GridPane();
+        Label labelNextDay = new Label("Next Day: Increase in cost for next day delivery");
+        Label labelSpeed = new Label("Speed: Increase in cost for speed delivery");
+        Label labelNormal = new Label("Normal: Normal delivery with no guarantee of speed delivery");
+        
+        VBox vBoxLabel = new VBox();
+        vBoxLabel.getChildren().addAll(
+                      labelNextDay,
+                      labelSpeed,
+                      labelNormal
+        );
+        gridPaneHelpTypeDelivery.getChildren().addAll(vBoxLabel);
+        gridPaneHelpTypeDelivery.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;"); 
+        return gridPaneHelpTypeDelivery;
+    }
     
     public void newOrderTabScene()
     {
@@ -122,6 +161,24 @@ public class HomePage extends Application {
                                                          radioOtherTypePackage);
         
         
+        JFXButton buttonHelpTypePackage = new JFXButton("?");
+        double buttonRadius = 15;
+        buttonHelpTypePackage.setShape(new Circle(buttonRadius));
+        buttonHelpTypePackage.setMinSize(2*buttonRadius, 2*buttonRadius);
+        buttonHelpTypePackage.setMaxSize(2*buttonRadius, 2*buttonRadius);
+
+        HBox hBoxTypePackage = new HBox();
+        hBoxTypePackage.getChildren().addAll(radioFragileTypePackage, 
+                                             radioDurableTypePackage,  
+                                             radioOtherTypePackage,
+                                             buttonHelpTypePackage);
+        GridPane gridPaneHelpTypePackage = getGridPaneHelpTypePackage();
+        JFXPopup popupHelpTypePackage = new JFXPopup(gridPaneHelpTypePackage); 
+        popupHelpTypePackage.setPrefHeight(100);
+        buttonHelpTypePackage.setOnAction( e-> {
+             popupHelpTypePackage.show(buttonHelpTypePackage, PopupVPosition.TOP, PopupHPosition.LEFT);
+        });
+        
         //Add type of delivery
         Label labelTypeDelivery = new Label("Type of delivery: ");
         labelTypeDelivery.setPadding(new Insets(10, 0, 0, 20));
@@ -145,15 +202,32 @@ public class HomePage extends Application {
                                                           radioSpeedTypeDelivery,
                                                           radioNormalTypeDelivery);
         
+        JFXButton buttonHelpTypeDelivery = new JFXButton("?");
+        buttonHelpTypeDelivery.setShape(new Circle(buttonRadius));
+        buttonHelpTypeDelivery.setMinSize(2*buttonRadius, 2*buttonRadius);
+        buttonHelpTypeDelivery.setMaxSize(2*buttonRadius, 2*buttonRadius);
+
+        HBox hBoxTypeDelivery = new HBox();
+        hBoxTypeDelivery.getChildren().addAll(radioNextDayTypeDelivery,
+                                             radioSpeedTypeDelivery,
+                                             radioNormalTypeDelivery,
+                                             buttonHelpTypeDelivery);
+        GridPane gridPaneHelpTypeDelivery = getGridPaneHelpTypeDelivery();
+        JFXPopup popupHelpTypeDelivery = new JFXPopup(gridPaneHelpTypeDelivery); 
+        popupHelpTypeDelivery.setPrefHeight(100);
+        buttonHelpTypeDelivery.setOnAction( e-> {
+             popupHelpTypeDelivery.show(buttonHelpTypeDelivery, PopupVPosition.TOP, PopupHPosition.LEFT);
+        });
         
         JFXTextArea textAreaOtherDetails = new JFXTextArea();
         textAreaOtherDetails.setPromptText("Any other details");
         textAreaOtherDetails.setPrefSize(500, 50);
+        textAreaOtherDetails.setMaxHeight(50);
         int intMaxCharLimit = 200;
         textAreaOtherDetails.setTextFormatter(new TextFormatter<String>(change -> 
             change.getControlNewText().length() <= intMaxCharLimit ? change : null));
 
-
+        JFXButton buttonConfirm = new JFXButton("Confirm");
         
         //Add everything to grid
         VBox vBox = new VBox(5);
@@ -163,10 +237,11 @@ public class HomePage extends Application {
                 textFieldSourceAddress,
                 checkBoxEnableSourceAddress,
                 labelTypePackage, 
-                hBoxRadioButtonsTypePackage,
+                hBoxTypePackage,
                 labelTypeDelivery,
-                hBoxRadioButtonsTypeDelivery,
-                textAreaOtherDetails
+                hBoxTypeDelivery,
+                textAreaOtherDetails,
+                buttonConfirm
                 );
         
         gridPane.getChildren().addAll(vBox);
