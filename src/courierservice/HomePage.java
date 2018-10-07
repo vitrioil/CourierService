@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
+import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXPopup.PopupHPosition;
 import com.jfoenix.controls.JFXPopup.PopupVPosition;
@@ -36,6 +37,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -280,6 +282,7 @@ public class HomePage extends Application {
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
         listViewOrder.getSelectionModel().select(0);
         
+        //For custom object `Order` as a listview we use cell factory
         listViewOrder.setCellFactory(param -> new ListCell<Order>() {
             @Override
             protected void updateItem(Order item, boolean empty) {
@@ -323,7 +326,7 @@ public class HomePage extends Application {
             
             rightDrawerPane.getChildren().clear();
             rightDrawerPane.getChildren().add(gridShowOrderDetail);
-            drawersStack.toggle(rightDrawer, true);
+            drawersStack.toggle(rightDrawer);
             
 //            JFXPopup popup = new JFXPopup(gridShowOrderDetail); 
 //           popup.setPrefHeight(100);
@@ -341,15 +344,73 @@ public class HomePage extends Application {
         history.setContent(gPane);
     }
         
+    private String[] getLocation(Order order)
+    {
+        //Write the part which gets location history 
+        //from database
+        String[] locHistory = {"Dispatched", "At the stop", "Reached"};
+        return locHistory;
+    }
+    
     public void trackingTabScene()
     {
         GridPane gPane = sampleGridPane();
         gPane.getStyleClass().add("grid-pane");
 
-        VBox vBox = new VBox();
-        gPane.getChildren().addAll(vBox);
+        Label labelTracking = new Label("Track your current order here!");
+        
+        ObservableList<Order> orderList = FXCollections.observableArrayList();
+        
+        /*To Do: Dynamically change this for getting current order*/
+        orderList.add(new Order("Phone", "123456789", "1", 1, 2));
+        orderList.add(new Order("Document", "123456789", "1", 2, 3));
+        ListView<Order> listViewOrder = new ListView<Order>(orderList);
+        listViewOrder.getSelectionModel().select(0);
+        
+        //For custom object `Order` as a listview we use cell factory
+        listViewOrder.setCellFactory(param -> new ListCell<Order>() {
+            @Override
+            protected void updateItem(Order item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.getName() == null) {
+                    setText(null);
+                } else {
+                    setText(item.getName());
+                }
+            }
+        });
+        listViewOrder.setPrefSize(500, 200);
+        
+        ObservableList<String> locationList = FXCollections.observableArrayList();
+        locationList.add(new String("Dispatched"));
+        JFXListView<String> listViewLoc = new JFXListView<String>();
+        
+        // For now display text viz. the last known address of the order
+        listViewOrder.setOnMouseClicked( e-> {
+                Order orderSelected = listViewOrder.getSelectionModel().getSelectedItem();
+                String[] locationStringList = getLocation(orderSelected);
+                listViewLoc.getItems().clear();
+                for(String loc: locationStringList)
+                {
+                    listViewLoc.getItems().add(loc);
+                }
+        });
+        
+        HBox hBox = new HBox();
+        hBox.setSpacing(10);
+        hBox.getChildren().addAll(listViewOrder, listViewLoc);
+        gPane.getChildren().addAll(hBox);
 
         tracking.setContent(gPane);
+    }
+    
+    public GridPane getGridSettings()
+    {
+        GridPane gridPaneSettings = new GridPane();
+        Label label = new Label("Will add settings options here");
+        
+        gridPaneSettings.getChildren().addAll(label);
+        return gridPaneSettings;
     }
     
     @Override
@@ -367,19 +428,54 @@ public class HomePage extends Application {
         TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
         
-        
-
         tabPane.getTabs().addAll(newOrder, history, tracking);
         
         tabPane.getSelectionModel().selectedItemProperty().addListener( (ov, oldTab, newTab) -> {
                 System.out.println(oldTab.getText() + " changed to " + newTab.getText());
                 tabPane.getSelectionModel().select(newTab);
+        });        
+        
+        
+        JFXButton buttonSettings = new JFXButton("Settings ");
+        
+        HBox hBox = new HBox();
+        hBox.setPadding(new Insets(2));
+
+        hBox.getChildren().addAll(buttonSettings);
+        
+        AnchorPane anchorPane = new AnchorPane();
+        AnchorPane.setTopAnchor(buttonSettings, 6.0);
+        AnchorPane.setRightAnchor(buttonSettings, 5.0);
+        AnchorPane.setTopAnchor(tabPane, 1.0);
+        AnchorPane.setRightAnchor(tabPane, 1.0);
+        AnchorPane.setLeftAnchor(tabPane, 1.0);
+        AnchorPane.setBottomAnchor(tabPane, 1.0);
+
+        anchorPane.getChildren().addAll(tabPane, buttonSettings);
+        
+        JFXDrawer rightDrawer = new JFXDrawer();
+        StackPane rightDrawerPane = new StackPane();
+        rightDrawerPane.getStyleClass().add("blue-400");
+        
+        rightDrawer.setDirection(DrawerDirection.RIGHT);
+        rightDrawer.setDefaultDrawerSize(200);
+        rightDrawer.setSidePane(rightDrawerPane);
+        rightDrawer.setOverLayVisible(false);
+        rightDrawer.setResizableOnDrag(true);
+
+        JFXDrawersStack drawersStack = new JFXDrawersStack();
+                
+        drawersStack.setContent(anchorPane);
+        GridPane gridSettings = getGridSettings();
+        rightDrawerPane.getChildren().add(gridSettings);
+            
+        buttonSettings.setOnAction(e -> {
+            drawersStack.toggle(rightDrawer);
         });
-           
-        
-        VBox vBox = new VBox(tabPane);
-        
-        Scene scene = new Scene(vBox, 500, 500);
+
+        borderPane.setCenter(drawersStack);
+                
+        Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);
