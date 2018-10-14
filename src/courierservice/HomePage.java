@@ -6,6 +6,7 @@
 package courierservice;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
@@ -33,6 +34,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextFormatter;
@@ -404,12 +406,62 @@ public class HomePage extends Application {
         tracking.setContent(gPane);
     }
     
-    public GridPane getGridSettings()
+    public GridPane getGridNotifications(JFXDrawersStack drawersStack, JFXDrawer rightDrawerNotifications)
+    {
+        GridPane gridPaneNotifications = new GridPane();
+        
+        JFXCheckBox checkShipment = new JFXCheckBox("Shipment Notifications");
+        JFXCheckBox checkAlerts = new JFXCheckBox("Alert notifications");
+        JFXCheckBox checkNewsLetters = new JFXCheckBox("Email notifications");
+        
+        Separator separator = new Separator();
+        
+        JFXButton buttonClose = new JFXButton("Close");
+        
+        buttonClose.setOnAction( e -> {
+            drawersStack.toggle(rightDrawerNotifications);
+        });
+        
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.getChildren().addAll(
+                        checkShipment,
+                        checkAlerts,
+                        checkNewsLetters,
+                        separator,
+                        buttonClose
+        );
+        
+        gridPaneNotifications.getChildren().addAll(vBox);
+        return gridPaneNotifications;
+    }
+            
+    public GridPane getGridSettings(JFXDrawersStack drawersStack, JFXDrawer rightDrawerSettings, JFXDrawer rightDrawerNotifications)
     {
         GridPane gridPaneSettings = new GridPane();
-        Label label = new Label("Will add settings options here");
         
-        gridPaneSettings.getChildren().addAll(label);
+        JFXButton buttonSignOut = new JFXButton("Sign Out");
+        JFXButton buttonNotifications = new JFXButton("Notifications");
+        
+        Separator seperator = new Separator();
+        
+        JFXButton buttonClose = new JFXButton("Close");
+        
+        buttonNotifications.setOnAction( e -> {
+            drawersStack.toggle(rightDrawerNotifications);
+        });
+        buttonClose.setOnAction( e -> {
+            drawersStack.toggle(rightDrawerSettings);
+        });
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.getChildren().addAll(buttonSignOut, 
+                                  buttonNotifications,
+                                  seperator,
+                                  buttonClose                         
+                );
+        
+        gridPaneSettings.getChildren().addAll(vBox);
         return gridPaneSettings;
     }
     
@@ -453,24 +505,35 @@ public class HomePage extends Application {
 
         anchorPane.getChildren().addAll(tabPane, buttonSettings);
         
-        JFXDrawer rightDrawer = new JFXDrawer();
-        StackPane rightDrawerPane = new StackPane();
-        rightDrawerPane.getStyleClass().add("blue-400");
+        JFXDrawer rightDrawerSettings = new JFXDrawer();
+        JFXDrawer rightDrawerNotifications = new JFXDrawer();
+        StackPane rightDrawerPaneSettings = new StackPane();
+        rightDrawerPaneSettings.getStyleClass().add("blue-400");
         
-        rightDrawer.setDirection(DrawerDirection.RIGHT);
-        rightDrawer.setDefaultDrawerSize(200);
-        rightDrawer.setSidePane(rightDrawerPane);
-        rightDrawer.setOverLayVisible(false);
-        rightDrawer.setResizableOnDrag(true);
+        rightDrawerSettings.setDirection(DrawerDirection.RIGHT);
+        rightDrawerSettings.setDefaultDrawerSize(200);
+        rightDrawerSettings.setSidePane(rightDrawerPaneSettings);
+        rightDrawerSettings.setOverLayVisible(false);
+        rightDrawerSettings.setResizableOnDrag(true);
+        
+        StackPane rightDrawerPaneNotifications = new StackPane();
+        rightDrawerNotifications.setDirection(DrawerDirection.RIGHT);
+        rightDrawerNotifications.setDefaultDrawerSize(200);
+        rightDrawerNotifications.setSidePane(rightDrawerPaneNotifications);
+        rightDrawerNotifications.setOverLayVisible(false);
+        rightDrawerNotifications.setResizableOnDrag(true);
 
+        
         JFXDrawersStack drawersStack = new JFXDrawersStack();
                 
         drawersStack.setContent(anchorPane);
-        GridPane gridSettings = getGridSettings();
-        rightDrawerPane.getChildren().add(gridSettings);
+        GridPane gridSettings = getGridSettings(drawersStack, rightDrawerSettings, rightDrawerNotifications);
+        GridPane gridNotifications = getGridNotifications(drawersStack, rightDrawerNotifications);
+        rightDrawerPaneSettings.getChildren().add(gridSettings);
+        rightDrawerPaneNotifications.getChildren().add(gridNotifications);
             
         buttonSettings.setOnAction(e -> {
-            drawersStack.toggle(rightDrawer);
+            drawersStack.toggle(rightDrawerSettings);
         });
 
         borderPane.setCenter(drawersStack);
