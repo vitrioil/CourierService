@@ -57,7 +57,12 @@ public class HomePage extends Application {
     Tab history;
     Tab tracking;
     
-    JFXSnackbar snackbar;
+    Stage primaryStage;
+    
+    BorderPane borderPane;
+    
+    HashMap<Stage, BorderPane> mapStagePane = new HashMap();
+
     
     public GridPane sampleGridPane()
     {
@@ -447,6 +452,12 @@ public class HomePage extends Application {
         
         JFXButton buttonClose = new JFXButton("Close");
         
+        buttonSignOut.setOnAction(e -> {
+            Login login = new Login();
+            HashMap<Stage, BorderPane> mapStPn = login.makeScene(primaryStage);
+            Stage stage = (Stage)mapStPn.keySet().toArray()[0];
+            primaryStage.getScene().setRoot(mapStPn.get(stage));
+        });
         buttonNotifications.setOnAction( e -> {
             drawersStack.toggle(rightDrawerNotifications);
         });
@@ -465,8 +476,9 @@ public class HomePage extends Application {
         return gridPaneSettings;
     }
     
-    @Override
-    public void start(Stage primaryStage) {
+    public BorderPane makeScene(Stage newStage)
+    {
+        primaryStage = newStage;
         BorderPane borderPane = new BorderPane();
         
         newOrder = new Tab("New Order");
@@ -537,7 +549,14 @@ public class HomePage extends Application {
         });
 
         borderPane.setCenter(drawersStack);
-                
+        return borderPane;
+    }
+    
+    @Override
+    public void start(Stage stage) {
+        primaryStage = stage;
+        borderPane = makeScene(primaryStage);
+        mapStagePane.put(primaryStage, borderPane);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 

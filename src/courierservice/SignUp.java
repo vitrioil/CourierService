@@ -8,7 +8,6 @@ package courierservice;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.HPos;
@@ -29,18 +28,25 @@ import javafx.stage.Stage;
  *
  * @author vitrioil
  */
-public class Login extends Application{
+public class SignUp extends Application{
     Tab login;
     BorderPane borderPane;
     Stage primaryStage;
-    HashMap<Stage, BorderPane> mapStagePane = new HashMap<Stage, BorderPane>();
-
     
-    public HashMap<Stage, BorderPane>  makeScene(Stage newStage)
+    public BorderPane getRootPane()
+    {
+            return borderPane;
+    }
+    
+    public SignUp()
+    {
+        borderPane = new BorderPane();
+    }
+    
+    public BorderPane makeScene(Stage newStage)
     {
         primaryStage = newStage;
-        borderPane = new BorderPane();
-                                        //top right bottom left
+                //top right bottom left
         //borderPane.setPadding(new Insets(100, 100, 100, 100));
 
         GridPane gridPane = new GridPane();
@@ -58,61 +64,63 @@ public class Login extends Application{
 //        label.setMinWidth(Region.USE_PREF_SIZE);
         label.setMaxWidth(Double.MAX_VALUE);
 
-        Label labelLogin = new Label("Log in");
-        labelLogin.setMaxWidth(Double.MAX_VALUE);
+        Label labelRegister = new Label("Register");
+        labelRegister.setMaxWidth(Double.MAX_VALUE);
         
+        JFXTextField textFieldEmail = new JFXTextField();
+        textFieldEmail.setPromptText("Email");
+        textFieldEmail.setMaxWidth(Double.MAX_VALUE);
+
         JFXTextField textFieldUserName = new JFXTextField();
         textFieldUserName.setPromptText("User Name");
-        textFieldUserName.setMaxWidth(Double.MAX_VALUE);
+        textFieldUserName.setMaxWidth(Double.MAX_VALUE);        
         
         JFXPasswordField textFieldPassword = new JFXPasswordField();
         textFieldPassword.setPromptText("Password");
+     
+        JFXPasswordField textFieldConfirmPassword = new JFXPasswordField();
+        textFieldConfirmPassword.setPromptText("Confirm Password");
+
+        JFXTextField textFieldAddress = new JFXTextField();
+        textFieldAddress.setPromptText("Source Address");
+        textFieldAddress.setMaxWidth(Double.MAX_VALUE);
         
-        JFXButton buttonLogin = new JFXButton("Log in");
-        JFXButton buttonSign = new JFXButton("Sign Up");
+        JFXButton buttonRegister = new JFXButton("Register");
         
-        buttonLogin.setOnAction( e -> {
-                //Add validation here
+        buttonRegister.setOnAction(e -> {
+                //Validate here
                 HomePage homePage = new HomePage();
                 primaryStage.getScene().setRoot(homePage.makeScene(newStage));
-              
         });
         
-        buttonSign.setOnAction( e -> {
-                SignUp reg = new SignUp();
-                primaryStage.getScene().setRoot(reg.makeScene(newStage));
-
-        });
         
         VBox vBox = new VBox();
         vBox.setSpacing(10);
         
         VBox.setVgrow(textFieldUserName, Priority.ALWAYS);
         VBox.setVgrow(textFieldPassword, Priority.ALWAYS);
-        VBox.setVgrow(buttonLogin, Priority.ALWAYS);
-        VBox.setVgrow(buttonSign, Priority.ALWAYS);
+        VBox.setVgrow(buttonRegister, Priority.ALWAYS);
         
-        vBox.getChildren().addAll(
-                    labelLogin,
-                    textFieldUserName,
-                    textFieldPassword,
-                    buttonLogin,
-                    buttonSign
+        vBox.getChildren().addAll(labelRegister,
+                        textFieldEmail,
+                        textFieldUserName,
+                        textFieldPassword,
+                        textFieldConfirmPassword,
+                        textFieldAddress,
+                        buttonRegister
         );
+        
         gridPane.getChildren().addAll(vBox);
         borderPane.setTop(label);
         borderPane.setCenter(gridPane);
-        
-        mapStagePane.clear();
-        mapStagePane.put(newStage, borderPane);
-        return mapStagePane;
+        return borderPane;
     }
     
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) { 
         primaryStage = stage;
-        mapStagePane = makeScene(primaryStage);
-        Scene scene = new Scene(mapStagePane.get(primaryStage), 500, 500);
+        borderPane = makeScene(primaryStage);
+        Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);
