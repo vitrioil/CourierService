@@ -239,3 +239,36 @@
     -fx-padding: 0 0 0 0;
 }
 
+.jfx-time-picker{
+    -jfx-default-color: #009688;
+}
+
+.jfx-time-picker,
+.jfx-time-picker:focused,
+.jfx-time-picker:focused:editable {
+    -fx-background-color: black;
+    /*TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT;*/
+}
+
+.jfx-time-picker > .arrow-button,
+.jfx-time-picker:editable > .arrow-button,
+.jfx-time-picker:focused > .arrow-button,
+.jfx-time-picker:editable:focused > .arrow-button{
+    -fx-background-color: TRANSPARENT;
+    -fx-padding: 1 8 1 8;
+}
+
+.jfx-time-picker > .arrow-button > .jfx-svg-glyph{
+    -fx-background-color: -jfx-default-color;
+}
+
+.date-picker-popup > * > .spinner {
+    -fx-spacing: 0.25em; /* 3 */
+    -fx-alignment: CENTER;
+    -fx-fill-height: false;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup > * > .spinner > .label {
+    -fx-alignment: CENTER;
+}

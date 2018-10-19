@@ -7,6 +7,7 @@ package courierservice;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
 import java.util.HashMap;
 import javafx.application.Application;
@@ -30,14 +31,62 @@ import javafx.stage.Stage;
  * @author vitrioil
  */
 public class Login extends Application{
+    
     Tab login;
+    //Similar to homepage create a borderpane that stores the layout
+    //Stage that stores the window info
     BorderPane borderPane;
     Stage primaryStage;
+    //Hashmap to pass mapping from stage to borderpane
     HashMap<Stage, BorderPane> mapStagePane = new HashMap<Stage, BorderPane>();
-
+    
+    JFXTextField textFieldUserName;
+    JFXPasswordField textFieldPassword;
+    JFXButton buttonLogin;
+    JFXButton buttonSign;
+            
+    static JFXPopup showPopup(String message)
+    {
+        GridPane gridPane = new GridPane();
+        Label labelMessage = new Label(message);
+        gridPane.add(labelMessage, 0, 0);
+        JFXPopup popup = new JFXPopup(gridPane);
+        return popup;
+    }
+    
+    boolean verifyLogin()
+    {
+        String userName = textFieldUserName.getText();
+        System.out.println("Username:"+userName+" welcome");
+        if (userName.trim().isEmpty())
+        {
+            JFXPopup popup = showPopup("No user name entered");
+            popup.show(textFieldUserName, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+            return false;
+        }
+        String password = textFieldPassword.getText();
+        if(password.trim().isEmpty())
+        {
+          JFXPopup popup = showPopup("Please enter password");
+          popup.show(textFieldPassword, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+          return false;
+        }
+        /*
+ 			=====================
+			Database support here
+			=====================
+                          verify
+        */
+        return true;
+    }
     
     public HashMap<Stage, BorderPane>  makeScene(Stage newStage)
     {
+    	/*
+		Make scene is used to create the scene 
+		and pass the borderpane
+	*/
+	//Important assignment that preserves the same window
         primaryStage = newStage;
         borderPane = new BorderPane();
                                         //top right bottom left
@@ -55,30 +104,45 @@ public class Login extends Application{
         label.setStyle("-fx-background-color: #003333; -fx-text-fill: white");
         label.setPrefSize(2000, 50);
         label.setAlignment(Pos.CENTER);
-//        label.setMinWidth(Region.USE_PREF_SIZE);
         label.setMaxWidth(Double.MAX_VALUE);
 
         Label labelLogin = new Label("Log in");
         labelLogin.setMaxWidth(Double.MAX_VALUE);
         
-        JFXTextField textFieldUserName = new JFXTextField();
+        textFieldUserName = new JFXTextField();
         textFieldUserName.setPromptText("User Name");
         textFieldUserName.setMaxWidth(Double.MAX_VALUE);
         
-        JFXPasswordField textFieldPassword = new JFXPasswordField();
+        textFieldPassword = new JFXPasswordField();
         textFieldPassword.setPromptText("Password");
         
-        JFXButton buttonLogin = new JFXButton("Log in");
-        JFXButton buttonSign = new JFXButton("Sign Up");
+        buttonLogin = new JFXButton("Log in");
+        buttonSign = new JFXButton("Sign Up");
         
         buttonLogin.setOnAction( e -> {
                 //Add validation here
-                HomePage homePage = new HomePage();
-                primaryStage.getScene().setRoot(homePage.makeScene(newStage));
-              
+		/*
+			=====================
+			Database support here
+			=====================
+		*/
+                boolean loginEnter = verifyLogin();
+                
+                // verify password
+                if (loginEnter)
+                {
+                    HomePage homePage = new HomePage();
+                    primaryStage.getScene().setRoot(homePage.makeScene(newStage));
+                }
+                
         });
         
         buttonSign.setOnAction( e -> {
+		/*
+			=====================
+			Database support here
+			=====================
+		*/
                 SignUp reg = new SignUp();
                 primaryStage.getScene().setRoot(reg.makeScene(newStage));
 

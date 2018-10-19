@@ -24,9 +24,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXTimePicker;
 import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,17 +52,26 @@ import javafx.scene.shape.Circle;
  * @author Admin
  */
 public class HomePage extends Application {
-    
+ 
+    // Three tabs at the top of home page
     Tab newOrder;
     Tab history;
     Tab tracking;
     
+    //Creating an object to pass to different scenes
+    //But they should have the same stage otherwise
+    //there will be multiple windows
     Stage primaryStage;
     
+    //Borderpane stores the layout of the scene
     BorderPane borderPane;
     
+    //Hashmap is used to transfer the primaryStage and borderPane
+    //across the scenes.
     HashMap<Stage, BorderPane> mapStagePane = new HashMap();
 
+    
+    double buttonRadius = 15;
     
     public GridPane sampleGridPane()
     {
@@ -83,6 +92,8 @@ public class HomePage extends Application {
 
         gridPane.getColumnConstraints().addAll(columnOneConstraints, columnTwoConstrains);
         */
+        
+        //Add a css class to so that all tabs will have the same effect 
         gridPane.getStyleClass().add("grid-pane");
         
         return gridPane;
@@ -90,6 +101,10 @@ public class HomePage extends Application {
     
     public GridPane getGridPaneHelpTypePackage()
     {
+        /*
+            This function is used to create grid for
+            the help button (?) button.
+        */
         GridPane gridPaneHelpTypePackage = new GridPane();
         Label labelFragile = new Label("Fragile: Increase in cost for padding and protection");
         Label labelDurable = new Label("Durable: Decrease in cost for reducing padding and protection");
@@ -108,6 +123,11 @@ public class HomePage extends Application {
     
     public GridPane getGridPaneHelpTypeDelivery()
     {
+        /*
+            This function is used to create grid for
+            the help button (?) button.
+        */
+        
         GridPane gridPaneHelpTypeDelivery = new GridPane();
         Label labelNextDay = new Label("Next Day: Increase in cost for next day delivery");
         Label labelSpeed = new Label("Speed: Increase in cost for speed delivery");
@@ -126,6 +146,10 @@ public class HomePage extends Application {
     
     public void newOrderTabScene()
     {
+        /*
+            This function creates the gridPane for the neworder tab
+            in the tab pane.
+        */
         GridPane gridPane = sampleGridPane();
         
 
@@ -141,6 +165,7 @@ public class HomePage extends Application {
         
         CheckBox checkBoxEnableSourceAddress = new CheckBox("Use different source address");
         checkBoxEnableSourceAddress.setOnAction(e -> {
+            //Add a listener so that button toggles the visibility of the source text field
             textFieldSourceAddress.setVisible(!textFieldSourceAddress.isVisible());
         });
         
@@ -169,9 +194,8 @@ public class HomePage extends Application {
                                                          radioDurableTypePackage,  
                                                          radioOtherTypePackage);
         
-        
+        //Create a circular button
         JFXButton buttonHelpTypePackage = new JFXButton("?");
-        double buttonRadius = 15;
         buttonHelpTypePackage.setShape(new Circle(buttonRadius));
         buttonHelpTypePackage.setMinSize(2*buttonRadius, 2*buttonRadius);
         buttonHelpTypePackage.setMaxSize(2*buttonRadius, 2*buttonRadius);
@@ -181,6 +205,7 @@ public class HomePage extends Application {
                                              radioDurableTypePackage,  
                                              radioOtherTypePackage,
                                              buttonHelpTypePackage);
+        //Add popup for the circular question mark button
         GridPane gridPaneHelpTypePackage = getGridPaneHelpTypePackage();
         JFXPopup popupHelpTypePackage = new JFXPopup(gridPaneHelpTypePackage); 
         popupHelpTypePackage.setPrefHeight(100);
@@ -216,11 +241,6 @@ public class HomePage extends Application {
         buttonHelpTypeDelivery.setMinSize(2*buttonRadius, 2*buttonRadius);
         buttonHelpTypeDelivery.setMaxSize(2*buttonRadius, 2*buttonRadius);
 
-        HBox hBoxTypeDelivery = new HBox();
-        hBoxTypeDelivery.getChildren().addAll(radioNextDayTypeDelivery,
-                                             radioSpeedTypeDelivery,
-                                             radioNormalTypeDelivery,
-                                             buttonHelpTypeDelivery);
         GridPane gridPaneHelpTypeDelivery = getGridPaneHelpTypeDelivery();
         JFXPopup popupHelpTypeDelivery = new JFXPopup(gridPaneHelpTypeDelivery); 
         popupHelpTypeDelivery.setPrefHeight(100);
@@ -228,15 +248,31 @@ public class HomePage extends Application {
              popupHelpTypeDelivery.show(buttonHelpTypeDelivery, PopupVPosition.TOP, PopupHPosition.LEFT);
         });
         
+        HBox hBoxTypeDelivery = new HBox();
+        hBoxTypeDelivery.getChildren().addAll(radioNextDayTypeDelivery,
+                                             radioSpeedTypeDelivery,
+                                             radioNormalTypeDelivery,
+                                             buttonHelpTypeDelivery);
+        
         JFXTextArea textAreaOtherDetails = new JFXTextArea();
         textAreaOtherDetails.setPromptText("Any other details");
         textAreaOtherDetails.setPrefSize(500, 50);
         textAreaOtherDetails.setMaxHeight(50);
         int intMaxCharLimit = 200;
+        //Limit the other details text field to 200 characters 
+        //So that when it will be printed for the delivery boy
+        //It wont go off paper
         textAreaOtherDetails.setTextFormatter(new TextFormatter<String>(change -> 
-            change.getControlNewText().length() <= intMaxCharLimit ? change : null));
+                change.getControlNewText().length() <= intMaxCharLimit ? change : null));
 
+        Label labelPickUpTime = new Label("Preferred time to pickup");
+        JFXTimePicker timePicker = new JFXTimePicker();
+        
         JFXButton buttonConfirm = new JFXButton("Confirm");
+        buttonConfirm.setOnAction(e -> {
+            String hour = Integer.toString(timePicker.getValue().getHour());
+            String minute = Integer.toString(timePicker.getValue().getMinute());
+        });
         
         //Add everything to grid
         VBox vBox = new VBox(5);
@@ -250,6 +286,8 @@ public class HomePage extends Application {
                 labelTypeDelivery,
                 hBoxTypeDelivery,
                 textAreaOtherDetails,
+                labelPickUpTime,
+                timePicker,
                 buttonConfirm
                 );
         
@@ -259,7 +297,14 @@ public class HomePage extends Application {
     
     public GridPane getOrderDetails(Order orderSelected, JFXButton showDetails)
     {
+        /*
+            Get the order from the Order object and 
+            Display every detail
         
+               ======================
+               Database support here!
+               ======================
+        */
         GridPane gridOrderDetails = new GridPane();
         
         HashMap<String, Label> orderDetails = orderSelected.getDetails();
@@ -277,11 +322,20 @@ public class HomePage extends Application {
     
     public void historyTabScene()
     {
+        /*
+            Make grid for the history tab
+        */
         GridPane gPane = sampleGridPane();
         gPane.getStyleClass().add("grid-pane");
 
         Label labelHistory = new Label("Check your history of couriers here!");
         
+        /*
+                Add random data for now
+               ======================
+               Database support here!
+               ======================
+        */
         ObservableList<Order> orderList = FXCollections.observableArrayList();
         orderList.add(new Order("Phone", "123456789", "1", 1, 2));
         orderList.add(new Order("Letter", "123456789", "2", 1, 3));
@@ -306,6 +360,7 @@ public class HomePage extends Application {
 
         JFXButton buttonGetDetails = new JFXButton("Find");        
         
+        //Flow pane is used here for the drawer pane (slider)
         FlowPane flowPane = new FlowPane();
         flowPane.setHgap(10);
         
@@ -335,9 +390,6 @@ public class HomePage extends Application {
             rightDrawerPane.getChildren().add(gridShowOrderDetail);
             drawersStack.toggle(rightDrawer);
             
-//            JFXPopup popup = new JFXPopup(gridShowOrderDetail); 
-//           popup.setPrefHeight(100);
-//            popup.show(buttonGetDetails, PopupVPosition.TOP, PopupHPosition.LEFT);
         });
         
         
@@ -355,6 +407,11 @@ public class HomePage extends Application {
     {
         //Write the part which gets location history 
         //from database
+        /*
+               ======================
+               Database support here!
+               ======================
+        */
         String[] locHistory = {"Dispatched", "At the stop", "Reached"};
         return locHistory;
     }
@@ -368,7 +425,12 @@ public class HomePage extends Application {
         
         ObservableList<Order> orderList = FXCollections.observableArrayList();
         
-        /*To Do: Dynamically change this for getting current order*/
+        /*
+	To Do: Dynamically change this for getting current order
+               ======================
+               Database support here!
+               ======================	
+	*/
         orderList.add(new Order("Phone", "123456789", "1", 1, 2));
         orderList.add(new Order("Document", "123456789", "1", 2, 3));
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
@@ -413,12 +475,18 @@ public class HomePage extends Application {
     
     public GridPane getGridNotifications(JFXDrawersStack drawersStack, JFXDrawer rightDrawerNotifications)
     {
+    	/*
+		Returns the grid for the notficaton
+		side drawer pane
+	*/
         GridPane gridPaneNotifications = new GridPane();
         
         JFXCheckBox checkShipment = new JFXCheckBox("Shipment Notifications");
         JFXCheckBox checkAlerts = new JFXCheckBox("Alert notifications");
         JFXCheckBox checkNewsLetters = new JFXCheckBox("Email notifications");
-        
+       
+       	//Add a separator (a line) in between 
+	//checkboxes and close button
         Separator separator = new Separator();
         
         JFXButton buttonClose = new JFXButton("Close");
@@ -443,11 +511,17 @@ public class HomePage extends Application {
             
     public GridPane getGridSettings(JFXDrawersStack drawersStack, JFXDrawer rightDrawerSettings, JFXDrawer rightDrawerNotifications)
     {
+    	/*
+		Returns the grid for the settings pane 
+
+	*/
         GridPane gridPaneSettings = new GridPane();
         
         JFXButton buttonSignOut = new JFXButton("Sign Out");
         JFXButton buttonNotifications = new JFXButton("Notifications");
         
+       	//Add a separator (a line) in between 
+	//checkboxes and close button
         Separator seperator = new Separator();
         
         JFXButton buttonClose = new JFXButton("Close");
@@ -459,9 +533,11 @@ public class HomePage extends Application {
             primaryStage.getScene().setRoot(mapStPn.get(stage));
         });
         buttonNotifications.setOnAction( e -> {
+	    // Toggle the notification drawer
             drawersStack.toggle(rightDrawerNotifications);
         });
         buttonClose.setOnAction( e -> {
+	    // Toggle the settings  drawer
             drawersStack.toggle(rightDrawerSettings);
         });
         VBox vBox = new VBox();
@@ -478,6 +554,13 @@ public class HomePage extends Application {
     
     public BorderPane makeScene(Stage newStage)
     {
+	/*
+		This function creates the whole scene
+		Also this function is called from different
+		Classes to switch between scenes
+	*/
+	//Important assignment, this 
+	//assignment preserves only one window
         primaryStage = newStage;
         BorderPane borderPane = new BorderPane();
         
@@ -496,6 +579,7 @@ public class HomePage extends Application {
         
         tabPane.getSelectionModel().selectedItemProperty().addListener( (ov, oldTab, newTab) -> {
                 System.out.println(oldTab.getText() + " changed to " + newTab.getText());
+		//Switch tab when the corresponding tab is pressed.
                 tabPane.getSelectionModel().select(newTab);
         });        
         
@@ -506,7 +590,10 @@ public class HomePage extends Application {
         hBox.setPadding(new Insets(2));
 
         hBox.getChildren().addAll(buttonSettings);
-        
+       
+        // Anchor pane is used to keep tabpane and settings button together
+	// HBox cannot be used because button will occupy all space 
+	// below it and it will remain empty
         AnchorPane anchorPane = new AnchorPane();
         AnchorPane.setTopAnchor(buttonSettings, 6.0);
         AnchorPane.setRightAnchor(buttonSettings, 5.0);
@@ -517,6 +604,7 @@ public class HomePage extends Application {
 
         anchorPane.getChildren().addAll(tabPane, buttonSettings);
         
+	// Add the settings drawer
         JFXDrawer rightDrawerSettings = new JFXDrawer();
         JFXDrawer rightDrawerNotifications = new JFXDrawer();
         StackPane rightDrawerPaneSettings = new StackPane();
@@ -528,6 +616,7 @@ public class HomePage extends Application {
         rightDrawerSettings.setOverLayVisible(false);
         rightDrawerSettings.setResizableOnDrag(true);
         
+	//Add the notifications drawer
         StackPane rightDrawerPaneNotifications = new StackPane();
         rightDrawerNotifications.setDirection(DrawerDirection.RIGHT);
         rightDrawerNotifications.setDefaultDrawerSize(200);
@@ -554,6 +643,11 @@ public class HomePage extends Application {
     
     @Override
     public void start(Stage stage) {
+    	/*
+  		The stage argument is the one that
+		creates the window and should be passed
+		along different scenes using makeScene's argument
+	*/
         primaryStage = stage;
         borderPane = makeScene(primaryStage);
         mapStagePane.put(primaryStage, borderPane);
