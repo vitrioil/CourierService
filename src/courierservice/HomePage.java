@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTimePicker;
+import java.time.LocalTime;
 import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -267,11 +268,58 @@ public class HomePage extends Application {
 
         Label labelPickUpTime = new Label("Preferred time to pickup");
         JFXTimePicker timePicker = new JFXTimePicker();
+        timePicker.setValue(LocalTime.NOON);
         
         JFXButton buttonConfirm = new JFXButton("Confirm");
         buttonConfirm.setOnAction(e -> {
+            boolean enterOrder = true;
             String hour = Integer.toString(timePicker.getValue().getHour());
             String minute = Integer.toString(timePicker.getValue().getMinute());
+            
+            String destinationAddress = textFieldDestinationAddress.getText();
+            if(destinationAddress.trim().isEmpty())
+            {
+                JFXPopup popup = Login.showPopup("Please fill the destination address");
+                popup.show(textFieldDestinationAddress, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                enterOrder = false;
+            }
+            String sourceAddress;
+            if(checkBoxEnableSourceAddress.isSelected())
+            {
+                sourceAddress = textFieldSourceAddress.getText();
+                if (sourceAddress.trim().isEmpty())
+                {
+                    JFXPopup popup = Login.showPopup("Please fill the source address or uncheck the box");
+                    popup.show(textFieldSourceAddress, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                    enterOrder = false;
+                         
+                }
+            }
+            else
+            {
+                /*
+                        =====================
+                        Database support here
+                        =====================
+                */
+//                sourceAddress = 
+            }
+            
+            String typePackage = ((JFXRadioButton)groupTypePackage.getSelectedToggle()).getText();
+            
+            String typeDelivery = ((JFXRadioButton)groupTypeDelivery.getSelectedToggle()).getText();
+            
+            String details = textAreaOtherDetails.getText();
+            if(enterOrder)
+            {
+                /*
+                        =====================
+                        Database support here
+                        =====================
+                */
+                //Order
+            }
+           
         });
         
         //Add everything to grid

@@ -44,6 +44,7 @@ public class Login extends Application{
     JFXPasswordField textFieldPassword;
     JFXButton buttonLogin;
     JFXButton buttonSign;
+    JFXButton buttonExit;
             
     static JFXPopup showPopup(String message)
     {
@@ -119,6 +120,8 @@ public class Login extends Application{
         buttonLogin = new JFXButton("Log in");
         buttonSign = new JFXButton("Sign Up");
         
+        buttonExit = new JFXButton("Exit");
+        
         buttonLogin.setOnAction( e -> {
                 //Add validation here
 		/*
@@ -147,6 +150,10 @@ public class Login extends Application{
                 primaryStage.getScene().setRoot(reg.makeScene(newStage));
 
         });
+        buttonExit.setOnAction(e-> {
+            Stage stage = (Stage) buttonExit.getScene().getWindow();
+            stage.close();
+        });
         
         VBox vBox = new VBox();
         vBox.setSpacing(10);
@@ -166,7 +173,7 @@ public class Login extends Application{
         gridPane.getChildren().addAll(vBox);
         borderPane.setTop(label);
         borderPane.setCenter(gridPane);
-        
+        borderPane.setBottom(buttonExit);
         mapStagePane.clear();
         mapStagePane.put(newStage, borderPane);
         return mapStagePane;

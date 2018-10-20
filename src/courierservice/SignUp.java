@@ -44,6 +44,7 @@ public class SignUp extends Application{
     
     HBox hBoxAddress;
     JFXButton buttonHelp;
+    JFXButton buttonExit;
     
     double buttonRadius = 15.0;
     
@@ -185,7 +186,7 @@ public class SignUp extends Application{
         });
         
         buttonRegister = new JFXButton("Register");
-        
+        buttonExit = new JFXButton("Exit");
         buttonRegister.setOnAction(e -> {
                 //Validate here
 		/*
@@ -201,6 +202,10 @@ public class SignUp extends Application{
                 }
         });
         
+        buttonExit.setOnAction(e -> {
+            Stage stage = (Stage) buttonExit.getScene().getWindow();
+            stage.close();
+        });
         
         VBox vBox = new VBox();
         vBox.setSpacing(10);
@@ -221,6 +226,8 @@ public class SignUp extends Application{
         gridPane.getChildren().addAll(vBox);
         borderPane.setTop(label);
         borderPane.setCenter(gridPane);
+        borderPane.setBottom(buttonExit);
+        
         return borderPane;
     }
     
