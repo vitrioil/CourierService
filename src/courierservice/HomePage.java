@@ -28,9 +28,13 @@ import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTimePicker;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -70,7 +74,6 @@ public class HomePage extends Application {
     //Hashmap is used to transfer the primaryStage and borderPane
     //across the scenes.
     HashMap<Stage, BorderPane> mapStagePane = new HashMap();
-
     
     double buttonRadius = 15;
     
@@ -144,7 +147,28 @@ public class HomePage extends Application {
         gridPaneHelpTypeDelivery.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;"); 
         return gridPaneHelpTypeDelivery;
     }
-    
+   
+    public GridPane  getConfirmOrderGridPane(JFXButton buttonConfirmOrder, JFXButton buttonAddObject, JFXButton buttonClose )
+    {
+       GridPane gridPane = new GridPane();
+       gridPane.setPadding(new Insets(10, 10 ,10 ,10));
+       Label labelConfirm = new Label("Do you want to confirm or add another object?");
+      
+       Separator separator = new Separator();
+
+	HBox hBox = new HBox();
+	hBox.setSpacing(10);
+        hBox.getChildren().addAll(
+	         buttonConfirmOrder,
+		 buttonAddObject,
+		 buttonClose
+	);
+       gridPane.add(labelConfirm, 0, 0);
+       gridPane.add(separator, 0, 1);
+       gridPane.add(hBox, 0, 2);
+       return gridPane;
+    }
+
     public void newOrderTabScene()
     {
         /*
@@ -170,7 +194,10 @@ public class HomePage extends Application {
             textFieldSourceAddress.setVisible(!textFieldSourceAddress.isVisible());
         });
         
-        
+        JFXTextField textFieldName = new JFXTextField();
+        textFieldName.setPromptText("Package name");
+        textFieldName.setPrefWidth(500);
+
         //Add type of package
         Label labelTypePackage = new Label("Type of package: ");
         labelTypePackage.setPadding(new Insets(10, 0, 0, 20));
@@ -271,6 +298,8 @@ public class HomePage extends Application {
         timePicker.setValue(LocalTime.NOON);
         
         JFXButton buttonConfirm = new JFXButton("Confirm");
+	List<Package> listPackage = new ArrayList<Package>();
+
         buttonConfirm.setOnAction(e -> {
             boolean enterOrder = true;
             String hour = Integer.toString(timePicker.getValue().getHour());
@@ -288,7 +317,7 @@ public class HomePage extends Application {
             {
                 sourceAddress = textFieldSourceAddress.getText();
                 if (sourceAddress.trim().isEmpty())
-                {
+	        {
                     JFXPopup popup = Login.showPopup("Please fill the source address or uncheck the box");
                     popup.show(textFieldSourceAddress, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
                     enterOrder = false;
@@ -298,15 +327,18 @@ public class HomePage extends Application {
             else
             {
                 /*
+			Get source address from db
                         =====================
                         Database support here
                         =====================
                 */
-//                sourceAddress = 
             }
-            
+            //All clear get details 
             String typePackage = ((JFXRadioButton)groupTypePackage.getSelectedToggle()).getText();
-            
+            String typeName = textFieldName.getText();
+	    Package pack = new Package(typePackage, typeName);
+	    listPackage.add(pack);
+
             String typeDelivery = ((JFXRadioButton)groupTypeDelivery.getSelectedToggle()).getText();
             
             String details = textAreaOtherDetails.getText();
@@ -317,7 +349,61 @@ public class HomePage extends Application {
                         Database support here
                         =====================
                 */
-                //Order
+		JFXButton buttonConfirmOrder = new JFXButton("Confirm");
+                JFXButton buttonAddObject  = new JFXButton("Add");
+                JFXButton buttonClose = new JFXButton("Delete order");
+		GridPane gridPaneConfirm = getConfirmOrderGridPane(buttonConfirmOrder, buttonAddObject, buttonClose);
+		JFXPopup popupConfirm = new JFXPopup(gridPaneConfirm);
+                popupConfirm.setPrefSize(500, 300);
+                Bounds rootBounds = borderPane.getLayoutBounds();
+		popupConfirm.show(buttonConfirm , JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                          // (rootBounds.getWidth() - popupConfirm.getPrefWidth()) / 2,
+                           //(rootBounds.getHeight() - popupConfirm.getPrefHeight()) / 2);
+                
+                
+		buttonAddObject.setOnAction( ev -> {
+	               textFieldSourceAddress.setEditable(false);
+		       textFieldDestinationAddress.setEditable(false);
+		       textAreaOtherDetails.setEditable(false);
+                       groupTypeDelivery.getToggles().forEach(t -> {
+                                Node node = (Node) t;
+                                node.setDisable(true);
+                       });
+                       popupConfirm.hide();
+                       textFieldName.requestFocus();
+                });
+                
+		buttonClose.setOnAction( ev -> {
+	               textFieldSourceAddress.setEditable(true);
+		       textFieldDestinationAddress.setEditable(true);
+		       textAreaOtherDetails.setEditable(true); 
+                       groupTypeDelivery.getToggles().forEach(t -> {
+                                Node node = (Node) t;
+                                node.setDisable(false);
+                       });
+                       popupConfirm.hide();  
+		});
+
+		buttonConfirmOrder.setOnAction( ev -> {
+                /*
+			Get package from `listPackage`
+                        =====================
+                 aaa       Database support here
+                        =====================
+                */
+                        for(Package p: listPackage)
+                        {
+                            System.out.println(p.name+" "+p.typePackage);
+                        }
+	               textFieldSourceAddress.setEditable(true);
+		       textFieldDestinationAddress.setEditable(true);
+		       textAreaOtherDetails.setEditable(true); 
+                       groupTypeDelivery.getToggles().forEach(t -> {
+                                Node node = (Node) t;
+                                node.setDisable(false);
+                       });
+                       popupConfirm.hide();   
+		});
             }
            
         });
@@ -329,6 +415,7 @@ public class HomePage extends Application {
                 textFieldDestinationAddress,
                 textFieldSourceAddress,
                 checkBoxEnableSourceAddress,
+                textFieldName,
                 labelTypePackage, 
                 hBoxTypePackage,
                 labelTypeDelivery,

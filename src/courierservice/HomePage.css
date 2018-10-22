@@ -151,8 +151,8 @@
 .jfx-rippler {
     -jfx-rippler-fill: red;
 }
+
 .jfx-popup-container{
-    -fx-background-color: gray;
     -fx-text-fill: -fx-theme-color;
     -fx-border-color: black;
     -fx-hgap:3;
