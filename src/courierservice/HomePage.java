@@ -7,6 +7,7 @@ package courierservice;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
@@ -355,7 +356,6 @@ public class HomePage extends Application {
 		GridPane gridPaneConfirm = getConfirmOrderGridPane(buttonConfirmOrder, buttonAddObject, buttonClose);
 		JFXPopup popupConfirm = new JFXPopup(gridPaneConfirm);
                 popupConfirm.setPrefSize(500, 300);
-                Bounds rootBounds = borderPane.getLayoutBounds();
 		popupConfirm.show(buttonConfirm , JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
                           // (rootBounds.getWidth() - popupConfirm.getPrefWidth()) / 2,
                            //(rootBounds.getHeight() - popupConfirm.getPrefHeight()) / 2);
@@ -687,6 +687,23 @@ public class HomePage extends Application {
         return gridPaneSettings;
     }
     
+    JFXComboBox getNotifications()
+    {
+          
+        /*
+	To Do: get notifications
+               ======================
+               Database support here!
+               ======================	
+	*/
+        JFXComboBox<String> comboBox = new JFXComboBox();
+        comboBox.setPromptText("Notifications");
+        
+        comboBox.getItems().addAll("Welcomeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        
+        return comboBox;
+    }
+    
     public BorderPane makeScene(Stage newStage)
     {
 	/*
@@ -719,7 +736,9 @@ public class HomePage extends Application {
         });        
         
         
-        JFXButton buttonSettings = new JFXButton("Settings ");
+        JFXButton buttonSettings = new JFXButton("Settings");
+        
+        JFXComboBox<String> comboBoxNotifications = getNotifications();
         
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(2));
@@ -732,12 +751,14 @@ public class HomePage extends Application {
         AnchorPane anchorPane = new AnchorPane();
         AnchorPane.setTopAnchor(buttonSettings, 6.0);
         AnchorPane.setRightAnchor(buttonSettings, 5.0);
+        AnchorPane.setTopAnchor(comboBoxNotifications, 4.0);
+        AnchorPane.setRightAnchor(comboBoxNotifications, 100.0);
         AnchorPane.setTopAnchor(tabPane, 1.0);
         AnchorPane.setRightAnchor(tabPane, 1.0);
         AnchorPane.setLeftAnchor(tabPane, 1.0);
         AnchorPane.setBottomAnchor(tabPane, 1.0);
 
-        anchorPane.getChildren().addAll(tabPane, buttonSettings);
+        anchorPane.getChildren().addAll(tabPane, buttonSettings, comboBoxNotifications);
         
 	// Add the settings drawer
         JFXDrawer rightDrawerSettings = new JFXDrawer();

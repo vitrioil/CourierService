@@ -272,3 +272,11 @@
 .date-picker-popup > * > .spinner > .label {
     -fx-alignment: CENTER;
 }
+
+.combo-box .cell{
+    -fx-text-fill: white;
+}
+
+.combo-box-popup > .string{
+    -fx-pref-width: 100
+}
