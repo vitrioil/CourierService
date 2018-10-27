@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package courierservice;
+package courierservice.Employee;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
+import courierservice.HomePage;
 import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -22,7 +23,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -30,7 +30,7 @@ import javafx.stage.Stage;
  *
  * @author vitrioil
  */
-public class Login extends Application{
+public class LoginEmp extends Application{
     
     Tab login;
     //Similar to homepage create a borderpane that stores the layout
@@ -49,9 +49,9 @@ public class Login extends Application{
     static JFXPopup showPopup(String message)
     {
         GridPane gridPane = new GridPane();
-        gridPane.setStyle("-fx-background-color: red;");
         Label labelMessage = new Label(message);
         gridPane.add(labelMessage, 0, 0);
+        gridPane.setStyle("-fx-background-color: red;");
         JFXPopup popup = new JFXPopup(gridPane);
         return popup;
     }
@@ -102,7 +102,7 @@ public class Login extends Application{
         gridPane.setPadding(new Insets(100, 100, 100, 100));     
         gridPane.setVgap(10);
 
-        Label label = new Label("Courier Services");
+        Label label = new Label("Courier Services::Employee");
         label.setStyle("-fx-background-color: #003333; -fx-text-fill: white");
         label.setPrefSize(2000, 50);
         label.setAlignment(Pos.CENTER);
@@ -119,7 +119,6 @@ public class Login extends Application{
         textFieldPassword.setPromptText("Password");
         
         buttonLogin = new JFXButton("Log in");
-        buttonSign = new JFXButton("Sign Up");
         
         buttonExit = new JFXButton("Exit");
         
@@ -135,22 +134,12 @@ public class Login extends Application{
                 // verify password
                 if (loginEnter)
                 {
-                    HomePage homePage = new HomePage();
+                    HomePageEmp homePage = new HomePageEmp();
                     primaryStage.getScene().setRoot(homePage.makeScene(newStage));
                 }
                 
         });
         
-        buttonSign.setOnAction( e -> {
-		/*
-			=====================
-			Database support here
-			=====================
-		*/
-                SignUp reg = new SignUp();
-                primaryStage.getScene().setRoot(reg.makeScene(newStage));
-
-        });
         buttonExit.setOnAction(e-> {
             Stage stage = (Stage) buttonExit.getScene().getWindow();
             stage.close();
@@ -162,14 +151,12 @@ public class Login extends Application{
         VBox.setVgrow(textFieldUserName, Priority.ALWAYS);
         VBox.setVgrow(textFieldPassword, Priority.ALWAYS);
         VBox.setVgrow(buttonLogin, Priority.ALWAYS);
-        VBox.setVgrow(buttonSign, Priority.ALWAYS);
         
         vBox.getChildren().addAll(
                     labelLogin,
                     textFieldUserName,
                     textFieldPassword,
-                    buttonLogin,
-                    buttonSign
+                    buttonLogin
         );
         gridPane.getChildren().addAll(vBox);
         borderPane.setTop(label);

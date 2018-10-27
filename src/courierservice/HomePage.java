@@ -78,7 +78,7 @@ public class HomePage extends Application {
     
     double buttonRadius = 15;
     
-    public GridPane sampleGridPane()
+    public static GridPane sampleGridPane()
     {
         GridPane gridPane = new GridPane();
         
@@ -151,7 +151,7 @@ public class HomePage extends Application {
    
     public GridPane  getConfirmOrderGridPane(JFXButton buttonConfirmOrder, JFXButton buttonAddObject, JFXButton buttonClose )
     {
-       GridPane gridPane = new GridPane();
+       GridPane gridPane = sampleGridPane();
        gridPane.setPadding(new Insets(10, 10 ,10 ,10));
        Label labelConfirm = new Label("Do you want to confirm or add another object?");
       
@@ -531,9 +531,9 @@ public class HomePage extends Application {
         HBox hBox = new HBox();
         hBox.setSpacing(10);
         
-        hBox.getChildren().addAll(drawersStack);
+        hBox.getChildren().addAll();
         
-        gPane.getChildren().addAll(hBox);
+        gPane.getChildren().addAll(drawersStack);
 
         history.setContent(gPane);
     }
@@ -554,7 +554,6 @@ public class HomePage extends Application {
     public void trackingTabScene()
     {
         GridPane gPane = sampleGridPane();
-        gPane.getStyleClass().add("grid-pane");
 
         Label labelTracking = new Label("Track your current order here!");
         
@@ -615,6 +614,7 @@ public class HomePage extends Application {
 		side drawer pane
 	*/
         GridPane gridPaneNotifications = new GridPane();
+        gridPaneNotifications.setAlignment(Pos.CENTER);
         
         JFXCheckBox checkShipment = new JFXCheckBox("Shipment Notifications");
         JFXCheckBox checkAlerts = new JFXCheckBox("Alert notifications");
@@ -651,6 +651,7 @@ public class HomePage extends Application {
 
 	*/
         GridPane gridPaneSettings = new GridPane();
+        gridPaneSettings.setAlignment(Pos.CENTER);
         
         JFXButton buttonSignOut = new JFXButton("Sign Out");
         JFXButton buttonNotifications = new JFXButton("Notifications");
@@ -696,11 +697,12 @@ public class HomePage extends Application {
                Database support here!
                ======================	
 	*/
-        JFXComboBox<String> comboBox = new JFXComboBox();
+        JFXComboBox<Label> comboBox = new JFXComboBox();
+        comboBox.setMaxWidth(400);
         comboBox.setPromptText("Notifications");
         
-        comboBox.getItems().addAll("Welcomeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        
+        comboBox.getItems().add(new Label("Welcomeaaaaaaaaaaaaaaaaaaaaaa"));
+        comboBox.getItems().add(new Label("Welcomeaaaaaaaaaaaaaaaaaaaaaa"));
         return comboBox;
     }
     
