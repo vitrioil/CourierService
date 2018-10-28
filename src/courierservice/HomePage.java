@@ -54,6 +54,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import courierservice.Database.Package;
 import courierservice.Database.Order;
+import courierservice.Database.Tracking;
 
 /**
  *
@@ -76,7 +77,7 @@ public class HomePage extends Application {
     BorderPane borderPane;
     
     Order order;
-                       
+    String TRACKING_DELIMITER = "=";                       
 
     //Hashmap is used to transfer the primaryStage and borderPane
     //across the scenes.
@@ -381,13 +382,13 @@ public class HomePage extends Application {
 
 		buttonConfirmOrder.setOnAction( ev -> {
                        order = new Order(sourceAddress, destinationAddress, typeDelivery, details, time, primaryConn);
-                       order.insertOrder();
+                       boolean orderCheck = order.insertOrder(primaryUser.getUserid());
                        int orderID = order.getOrderid();
                        for(Package p: listPackage)
                        {
                            System.out.println(p.getPackageName()+" "+p.getPackageType());
                            p.setOrderid(orderID);
-                           p.insertObject();
+                           boolean packageCheck = p.insertObject();
                        }
                        listPackage.clear();
 	               textFieldSourceAddress.setEditable(true);
@@ -436,18 +437,20 @@ public class HomePage extends Application {
                ======================
         */
         GridPane gridOrderDetails = new GridPane();
+        int orderID = orderSelected.getOrderid();
+        ArrayList<Package> listPackage  = Package.getPackages(orderID, primaryConn);
      /*   
         HashMap<String, Label> orderDetails = orderSelected.getDetails();
-        
+        */
         VBox vBox = new VBox();
         
-        for (HashMap.Entry< String,Label> m:orderDetails.entrySet())
+        for(Package p: listPackage)
         {
-           vBox.getChildren().add(m.getValue());
+           vBox.getChildren().add(new Label(""));
         }
         
         gridOrderDetails.getChildren().addAll(vBox);
-        */
+        
         return gridOrderDetails;
     }
     
@@ -507,7 +510,6 @@ public class HomePage extends Application {
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
         drawersStack.setContent(flowPane);
-
         
         buttonGetDetails.setOnAction(e -> {
             System.out.println("Getting the order details");
@@ -535,13 +537,19 @@ public class HomePage extends Application {
     {
         //Write the part which gets location history 
         //from database
-        /*
-               ======================
-               Database support here!
-               ======================
-        */
-        String[] locHistory = {"Dispatched", "At the stop", "Reached"};
-        return locHistory;
+        
+        Tracking track = new Tracking(primaryUser.getUserid(), order.getOrderid(), primaryConn);
+        HashMap<String, String> trackingDetails = track.getOrderDetails();
+        System.out.println(trackingDetails.get("Details"));
+        String locationHistory[] = trackingDetails.get("Details").split(TRACKING_DELIMITER);
+        return locationHistory;
+    }
+    
+    public ObservableList<Order> getOrders()
+    {
+        ArrayList<Order> orderArrayList = primaryUser.getOrder();
+        ObservableList<Order> orderList = FXCollections.observableArrayList(orderArrayList);
+        return orderList;
     }
     
     public void trackingTabScene()
@@ -550,14 +558,9 @@ public class HomePage extends Application {
 
         Label labelTracking = new Label("Track your current order here!");
         
-        ObservableList<Order> orderList = FXCollections.observableArrayList();
+        ObservableList<Order> orderList = getOrders();
         
-        /*
-	To Do: Dynamically change this for getting current order
-               ======================
-               Database support here!
-               ======================	
-	*/
+        
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
         listViewOrder.getSelectionModel().select(0);
         
@@ -590,10 +593,19 @@ public class HomePage extends Application {
                 }
         });
         
-        HBox hBox = new HBox();
-        hBox.setSpacing(10);
-        hBox.getChildren().addAll(listViewOrder, listViewLoc);
-        gPane.getChildren().addAll(hBox);
+        JFXButton buttonRefresh = new JFXButton("Refresh");
+        buttonRefresh.setOnAction(e -> {
+                ObservableList<Order> orderListRefreshed = getOrders();
+                listViewOrder.getItems().clear();
+                listViewOrder.getItems().addAll(orderListRefreshed);
+        });
+        
+       // HBox hBox = new HBox();
+        //hBox.setSpacing(10);
+        //hBox.getChildren().addAll(listViewOrder, listViewLoc);
+        gPane.add(listViewOrder, 0, 0);
+        gPane.add(listViewLoc, 1, 0);
+        gPane.add(buttonRefresh, 0, 1);
 
         tracking.setContent(gPane);
     }

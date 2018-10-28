@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Package {
 	static Connection myConn;
@@ -55,13 +57,13 @@ public class Package {
 		return -1;
 	}
 	
-	public Package[] getObject(int orderId) {
+	public Package[] getObject(int orderID) {
 		try {
 			myStmt = myConn.prepareStatement("select * from object where orderid = ?" );
-			myStmt.setInt(1, orderId);
+			myStmt.setInt(1, orderID);
 			ResultSet myRs = myStmt.executeQuery();
 			myStmt.executeUpdate();
-			Package[] obj_arr=new Package[getObjectCount(orderId)];
+			Package[] obj_arr=new Package[getObjectCount(orderID)];
 			
 			int i=0;
 			while(myRs.next() ) {
@@ -69,7 +71,8 @@ public class Package {
 				obj_arr[i].orderid=myRs.getInt("orderid");
 				obj_arr[i].packageName=myRs.getString("packagename");
 				obj_arr[i].packageType=myRs.getString("packageType");
-			}
+                                i += 1;
+                        }
 			return obj_arr;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -78,6 +81,30 @@ public class Package {
 		return null;
 	}
 
+        public static ArrayList<Package> getPackages(int orderID, Connection myConn)
+        {
+            ArrayList<Package> listPackages = new ArrayList<>();
+            try {
+			myStmt = myConn.prepareStatement("select objectid, packageType,packageName from object where orderid=?" );
+			myStmt.setInt(1, orderID);
+			ResultSet myRs = myStmt.executeQuery();
+			myStmt.executeUpdate();
+			
+			int i=0;
+			while(myRs.next() ) {
+                                Package p = new Package(myRs.getString("packageType"), myRs.getString("packagename"), myConn);
+				listPackages.add(i, p);
+                                i += 1;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+            
+            
+            return listPackages;
+        }
+        
 	public String getPackageType() {
 		return packageType;
 	}

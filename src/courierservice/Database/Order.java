@@ -18,24 +18,26 @@ public class Order {
 		this.myConn=myConn;
 	}
 	
-	public Order(String source,String destination,String deliveryType,String details, Time pickupTime,Connection myConn) {
+	public Order(String source, String destination, String deliveryType, String details,
+                Time pickupTime, Connection myConn) {
 		this(myConn);
 		this.setSource(source);this.setDestination(destination);this.setPickupTime(pickupTime);
 		this.setDeliveryType(deliveryType);this.setDetails(details);
 	}
 	
-	public boolean insertOrder() {
+	public boolean insertOrder(int userid) {
                 int orderid = getMaxOrderID() + 1;
                 this.setOrderid(orderid);
 		try {
-			myStmt = myConn.prepareStatement("insert into Orders (orderid, destination,source,deliverytype,details,pickuptime)" 
-					+ "values (?,?,?,?,?,?)" );
-			myStmt.setInt(1, this.getOrderid());
-			myStmt.setString(2, this.getDestination());
-			myStmt.setString(3, this.getSource());
-			myStmt.setString(4, this.getDeliveryType());
-			myStmt.setString(5, this.getDetails());
-			myStmt.setTime(6, this.getPickupTime());
+			myStmt = myConn.prepareStatement("insert into Orders (userid, orderid, destination,source,deliverytype,details,pickuptime)" 
+					+ "values (?,?,?,?,?,?,?)" );
+			myStmt.setInt(1, userid);
+			myStmt.setInt(2, this.getOrderid());
+			myStmt.setString(3, this.getDestination());
+			myStmt.setString(4, this.getSource());
+			myStmt.setString(5, this.getDeliveryType());
+			myStmt.setString(6, this.getDetails());
+			myStmt.setTime(7, this.getPickupTime());
 			myStmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -89,7 +91,8 @@ public class Order {
 			e.printStackTrace();
 		}
 	}*/
-
+       
+        
 	public int getOrderid() {
 		return orderid;
 	}

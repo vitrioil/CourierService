@@ -4,6 +4,7 @@ import java.sql.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 public class User {
 	static Connection myConn;
@@ -130,6 +131,35 @@ public class User {
                 e.printStackTrace();
                }
             return generatedPassword;
+        }
+        
+         public ArrayList<Order> getOrder()
+        {
+            ResultSet rs;
+            ArrayList<Order> arrayListOrder = new ArrayList<>();
+            try {
+			String query = "select orderid,source,destination,deliverytype,details,pickuptime"
+                                + " from Orders inner join users where users.userid = ?" ;
+                        myStmt = this.myConn.prepareStatement(query);
+                        myStmt.setInt(1, this.getUserid());
+                        rs = myStmt.executeQuery();
+			while(rs.next())
+                        {
+                            Order order = new Order(rs.getString("source"),
+                                              rs.getString("destination"),
+                                              rs.getString("deliverytype"),
+                                              rs.getString("details"),
+                                              rs.getTime("pickuptime"),
+                                              this.myConn
+                            );
+                            order.setOrderid(rs.getInt("orderid"));
+                            arrayListOrder.add(order);
+                        }
+                } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+                 return arrayListOrder;
         }
         
 	public int getUserid() {
