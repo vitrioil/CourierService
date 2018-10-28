@@ -9,9 +9,14 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
+import courierservice.Database.User;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.regex.Pattern;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,6 +45,7 @@ public class SignUp extends Application{
     JFXPasswordField textFieldPassword;
     JFXPasswordField textFieldConfirmPassword;
     JFXTextField textFieldAddress;
+    JFXTextField textFieldPhone;
     JFXButton buttonRegister;
     
     HBox hBoxAddress;
@@ -52,7 +58,13 @@ public class SignUp extends Application{
                             "[a-zA-Z0-9_+&*-]+)*@" + 
                             "(?:[a-zA-Z0-9-]+\\.)+[a-z" + 
                             "A-Z]{2,7}$"; 
+    Pattern  pattern = Pattern.compile(emailRegex);
 
+    String urlConn="jdbc:mysql://localhost:3306/db2 ";
+    String userConn="student";
+    String passwordConn="student";
+    
+    Connection primaryConn;
     
     public BorderPane getRootPane()
     {
@@ -62,15 +74,12 @@ public class SignUp extends Application{
     public SignUp()
     {
         borderPane = new BorderPane();
+        
     }
     
-    boolean verifySignUp()
+    boolean verifySignUp(String userEmail,String userName,String userPassword, String userConfirmPassword,String userAddress)
     {
-        String userEmail = textFieldEmail.getText();
-        String userName = textFieldUserName.getText();
-        String userPassword = textFieldPassword.getText();
-        String userConfirmPassword = textFieldConfirmPassword.getText();
-        String userAddress = textFieldAddress.getText();
+        
         
         if (userEmail.trim().isEmpty())
         {
@@ -102,30 +111,30 @@ public class SignUp extends Application{
            popup.show(textFieldAddress, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
            return false;
         }
-        
+        if (textFieldPhone.getText().trim().isEmpty())
+        {
+           JFXPopup popup = Login.showPopup("Enter Phone number"); 
+           popup.show(textFieldPhone, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+           return false;
+        }
         if(!userPassword.equals(userConfirmPassword))
         {
             JFXPopup popup = Login.showPopup("Passwords do not match");
             popup.show(textFieldConfirmPassword, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
             return false;
         }
-        Pattern  pattern = Pattern.compile(emailRegex);
         if(!pattern.matcher(userEmail).matches())
         {
             JFXPopup popup = Login.showPopup("Invalid email address");
             popup.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
             return false;
         }
-        /*
-			=====================
-			Database support here
-			=====================
-        */
         return true;
     }
     
-    public BorderPane makeScene(Stage newStage)
+    public BorderPane makeScene(Stage newStage, Connection newConn)
     {
+        primaryConn = newConn;
         primaryStage = newStage;
                 //top right bottom left
         //borderPane.setPadding(new Insets(100, 100, 100, 100));
@@ -166,6 +175,20 @@ public class SignUp extends Application{
         textFieldAddress.setMaxWidth(Double.MAX_VALUE);
         textFieldAddress.setPrefWidth(500);
 
+        textFieldPhone = new JFXTextField();
+        textFieldPhone.setPromptText("Phone number");
+        textFieldPhone.setMaxWidth(Double.MAX_VALUE);
+        textFieldPhone.setPrefWidth(500);
+        textFieldPhone.textProperty().addListener(new ChangeListener<String>() {
+        @Override
+        public void changed(ObservableValue<? extends String> observable, String oldValue, 
+            String newValue) {
+            if (!newValue.matches("\\d*")) {
+                textFieldPhone.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        }
+        });
+                   
         buttonHelp = new JFXButton("?");
         buttonHelp.setShape(new Circle(buttonRadius));
         buttonHelp.setMinSize(2*buttonRadius, 2*buttonRadius);
@@ -188,18 +211,28 @@ public class SignUp extends Application{
         buttonRegister = new JFXButton("Register");
         buttonExit = new JFXButton("Exit");
         buttonRegister.setOnAction(e -> {
-                //Validate here
-		/*
-			=====================
-			Database support here
-			=====================
-		*/
-                boolean signUpEnter = verifySignUp();
-                if (signUpEnter)
-                {
-                    HomePage homePage = new HomePage();
-                    primaryStage.getScene().setRoot(homePage.makeScene(newStage));
+                String userEmail = textFieldEmail.getText();
+                String userName = textFieldUserName.getText();
+                String userPassword = textFieldPassword.getText();
+                String userConfirmPassword = textFieldConfirmPassword.getText();
+                String userAddress = textFieldAddress.getText();
+                String userPhone = textFieldPhone.getText();
+                
+                boolean signUpEnter = verifySignUp(userEmail,userName,userPassword,userConfirmPassword,userAddress);
+                User user;
+                try{
+                    user = new User(userName, userEmail,userPassword,userAddress,userPhone,primaryConn);
+                    if (signUpEnter)
+                    {
+                        user.insertUser();
+                        HomePage homePage = new HomePage();
+                        primaryStage.getScene().setRoot(homePage.makeScene(newStage, user, primaryConn));
+                    }
                 }
+                catch(Exception exc){
+                    exc.printStackTrace();
+                }
+                    
         });
         
         buttonExit.setOnAction(e -> {
@@ -220,6 +253,7 @@ public class SignUp extends Application{
                         textFieldPassword,
                         textFieldConfirmPassword,
                         hBoxAddress,
+                        textFieldPhone,
                         buttonRegister
         );
         
@@ -234,7 +268,7 @@ public class SignUp extends Application{
     @Override
     public void start(Stage stage) { 
         primaryStage = stage;
-        borderPane = makeScene(primaryStage);
+        borderPane = makeScene(primaryStage, primaryConn);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 

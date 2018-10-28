@@ -183,7 +183,7 @@ public class HomePageEmp extends Application{
         GridPane gridPane = sampleGridPane();
         
         JFXTreeTableColumn<Payment, String> tableColumnOrderID = new JFXTreeTableColumn<>("Order ID");
-        tableColumnOrderID.setPrefWidth(250);
+        tableColumnOrderID.setPrefWidth(300);
         tableColumnOrderID.setStyle("-fx-background-color: black;-fx-text-fill:white");
         tableColumnOrderID.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
                 if (tableColumnOrderID.validateValue(param)) {
@@ -194,7 +194,7 @@ public class HomePageEmp extends Application{
         });
 
         JFXTreeTableColumn<Payment, String> tableColumnPrice = new JFXTreeTableColumn<>("Price");
-        tableColumnPrice.setPrefWidth(250);
+        tableColumnPrice.setPrefWidth(300);
         tableColumnPrice.setStyle("-fx-background-color: black;-fx-text-fill:white");
         tableColumnPrice.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
             if (tableColumnPrice.validateValue(param)) {
@@ -205,7 +205,7 @@ public class HomePageEmp extends Application{
         });
         
         JFXTreeTableColumn<Payment, String> tableColumnTime = new JFXTreeTableColumn<>("Date");
-        tableColumnTime.setPrefWidth(250);
+        tableColumnTime.setPrefWidth(300);
         tableColumnTime.setStyle("-fx-background-color: black;-fx-text-fill:white");
         tableColumnTime.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
                 if (tableColumnTime.validateValue(param)) {
@@ -216,7 +216,7 @@ public class HomePageEmp extends Application{
         });
 
         JFXTreeTableColumn<Payment, String> tableColumnCustomerID = new JFXTreeTableColumn<>("Customer ID");
-        tableColumnCustomerID.setPrefWidth(250);
+        tableColumnCustomerID.setPrefWidth(300);
         tableColumnCustomerID.setStyle("-fx-background-color: black;-fx-text-fill:white");
         tableColumnCustomerID.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
             if (tableColumnCustomerID.validateValue(param)) {
@@ -283,7 +283,7 @@ public class HomePageEmp extends Application{
         BorderPane borderPane = new BorderPane();
         
         updateShipment = new Tab("Update Shipment");
-        pendingPayment = new Tab("Payments");
+        pendingPayment = new Tab("Pending Payments");
         
         updateShipmentTabScene();
         pendingPaymentTabScene();

@@ -28,13 +28,14 @@ import javafx.stage.Stage;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTimePicker;
+import courierservice.Database.User;
+import java.sql.Connection;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -51,7 +52,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
-
+import courierservice.Database.Package;
+import courierservice.Database.Order;
 
 /**
  *
@@ -68,10 +70,14 @@ public class HomePage extends Application {
     //But they should have the same stage otherwise
     //there will be multiple windows
     Stage primaryStage;
-    
+    User primaryUser;
+    Connection primaryConn;
     //Borderpane stores the layout of the scene
     BorderPane borderPane;
     
+    Order order;
+                       
+
     //Hashmap is used to transfer the primaryStage and borderPane
     //across the scenes.
     HashMap<Stage, BorderPane> mapStagePane = new HashMap();
@@ -301,11 +307,18 @@ public class HomePage extends Application {
         JFXButton buttonConfirm = new JFXButton("Confirm");
 	List<Package> listPackage = new ArrayList<Package>();
 
+        JFXButton buttonConfirmOrder = new JFXButton("Confirm");
+        JFXButton buttonAddObject  = new JFXButton("Add");
+        JFXButton buttonClose = new JFXButton("Delete order");
+        GridPane gridPaneConfirm = getConfirmOrderGridPane(buttonConfirmOrder, buttonAddObject, buttonClose);
+        JFXPopup popupConfirm = new JFXPopup(gridPaneConfirm);
+        popupConfirm.setPrefSize(500, 300);
+		
         buttonConfirm.setOnAction(e -> {
             boolean enterOrder = true;
             String hour = Integer.toString(timePicker.getValue().getHour());
             String minute = Integer.toString(timePicker.getValue().getMinute());
-            
+            java.sql.Time time = java.sql.Time.valueOf(hour+":"+minute+":00");
             String destinationAddress = textFieldDestinationAddress.getText();
             if(destinationAddress.trim().isEmpty())
             {
@@ -327,39 +340,21 @@ public class HomePage extends Application {
             }
             else
             {
-                /*
-			Get source address from db
-                        =====================
-                        Database support here
-                        =====================
-                */
+                sourceAddress = primaryUser.getSourceAddress();
             }
             //All clear get details 
+            
+            String typeDelivery = ((JFXRadioButton)groupTypeDelivery.getSelectedToggle()).getText();
+            String details = textAreaOtherDetails.getText();
+            
             String typePackage = ((JFXRadioButton)groupTypePackage.getSelectedToggle()).getText();
             String typeName = textFieldName.getText();
-	    Package pack = new Package(typePackage, typeName);
+	    Package pack = new Package(typePackage, typeName, primaryConn);
 	    listPackage.add(pack);
 
-            String typeDelivery = ((JFXRadioButton)groupTypeDelivery.getSelectedToggle()).getText();
-            
-            String details = textAreaOtherDetails.getText();
             if(enterOrder)
             {
-                /*
-                        =====================
-                        Database support here
-                        =====================
-                */
-		JFXButton buttonConfirmOrder = new JFXButton("Confirm");
-                JFXButton buttonAddObject  = new JFXButton("Add");
-                JFXButton buttonClose = new JFXButton("Delete order");
-		GridPane gridPaneConfirm = getConfirmOrderGridPane(buttonConfirmOrder, buttonAddObject, buttonClose);
-		JFXPopup popupConfirm = new JFXPopup(gridPaneConfirm);
-                popupConfirm.setPrefSize(500, 300);
 		popupConfirm.show(buttonConfirm , JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
-                          // (rootBounds.getWidth() - popupConfirm.getPrefWidth()) / 2,
-                           //(rootBounds.getHeight() - popupConfirm.getPrefHeight()) / 2);
-                
                 
 		buttonAddObject.setOnAction( ev -> {
 	               textFieldSourceAddress.setEditable(false);
@@ -385,16 +380,16 @@ public class HomePage extends Application {
 		});
 
 		buttonConfirmOrder.setOnAction( ev -> {
-                /*
-			Get package from `listPackage`
-                        =====================
-                 aaa       Database support here
-                        =====================
-                */
-                        for(Package p: listPackage)
-                        {
-                            System.out.println(p.name+" "+p.typePackage);
-                        }
+                       order = new Order(sourceAddress, destinationAddress, typeDelivery, details, time, primaryConn);
+                       order.insertOrder();
+                       int orderID = order.getOrderid();
+                       for(Package p: listPackage)
+                       {
+                           System.out.println(p.getPackageName()+" "+p.getPackageType());
+                           p.setOrderid(orderID);
+                           p.insertObject();
+                       }
+                       listPackage.clear();
 	               textFieldSourceAddress.setEditable(true);
 		       textFieldDestinationAddress.setEditable(true);
 		       textAreaOtherDetails.setEditable(true); 
@@ -441,7 +436,7 @@ public class HomePage extends Application {
                ======================
         */
         GridPane gridOrderDetails = new GridPane();
-        
+     /*   
         HashMap<String, Label> orderDetails = orderSelected.getDetails();
         
         VBox vBox = new VBox();
@@ -452,6 +447,7 @@ public class HomePage extends Application {
         }
         
         gridOrderDetails.getChildren().addAll(vBox);
+        */
         return gridOrderDetails;
     }
     
@@ -472,9 +468,6 @@ public class HomePage extends Application {
                ======================
         */
         ObservableList<Order> orderList = FXCollections.observableArrayList();
-        orderList.add(new Order("Phone", "123456789", "1", 1, 2));
-        orderList.add(new Order("Letter", "123456789", "2", 1, 3));
-        orderList.add(new Order("Document", "123456789", "3", 2, 1));
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
         listViewOrder.getSelectionModel().select(0);
         
@@ -484,10 +477,10 @@ public class HomePage extends Application {
             protected void updateItem(Order item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (empty || item == null || item.getName() == null) {
+                if (empty || item == null || item.getDetails()== null) {
                     setText(null);
                 } else {
-                    setText(item.getName());
+                    setText(item.getDetails());
                 }
             }
         });
@@ -565,8 +558,6 @@ public class HomePage extends Application {
                Database support here!
                ======================	
 	*/
-        orderList.add(new Order("Phone", "123456789", "1", 1, 2));
-        orderList.add(new Order("Document", "123456789", "1", 2, 3));
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
         listViewOrder.getSelectionModel().select(0);
         
@@ -575,10 +566,10 @@ public class HomePage extends Application {
             @Override
             protected void updateItem(Order item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null || item.getName() == null) {
+                if (empty || item == null || item.getDetails()== null) {
                     setText(null);
                 } else {
-                    setText(item.getName());
+                    setText(item.getDetails());
                 }
             }
         });
@@ -664,7 +655,7 @@ public class HomePage extends Application {
         
         buttonSignOut.setOnAction(e -> {
             Login login = new Login();
-            HashMap<Stage, BorderPane> mapStPn = login.makeScene(primaryStage);
+            HashMap<Stage, BorderPane> mapStPn = login.makeScene(primaryStage, primaryConn);
             Stage stage = (Stage)mapStPn.keySet().toArray()[0];
             primaryStage.getScene().setRoot(mapStPn.get(stage));
         });
@@ -706,7 +697,7 @@ public class HomePage extends Application {
         return comboBox;
     }
     
-    public BorderPane makeScene(Stage newStage)
+    public BorderPane makeScene(Stage newStage, User newUser, Connection newConn)
     {
 	/*
 		This function creates the whole scene
@@ -716,6 +707,8 @@ public class HomePage extends Application {
 	//Important assignment, this 
 	//assignment preserves only one window
         primaryStage = newStage;
+        primaryUser = newUser;
+        primaryConn = newConn;
         BorderPane borderPane = new BorderPane();
         
         newOrder = new Tab("New Order");
@@ -807,7 +800,7 @@ public class HomePage extends Application {
 		along different scenes using makeScene's argument
 	*/
         primaryStage = stage;
-        borderPane = makeScene(primaryStage);
+        borderPane = makeScene(primaryStage, primaryUser, primaryConn);
         mapStagePane.put(primaryStage, borderPane);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
