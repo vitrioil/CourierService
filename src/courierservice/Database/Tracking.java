@@ -16,6 +16,8 @@ public class Tracking {
 	private String trackingdetail;
         private Timestamp dispatchTime;
 
+        private boolean reached = false;
+        
 	public Tracking(Connection myConn) {
 		this.myConn=myConn;
 	}
@@ -70,11 +72,25 @@ public class Tracking {
                 myStmt.setString(4, this.getTrackingdetail());
                 myStmt.setTimestamp(5, this.getDispatchTime());
                 myStmt.executeUpdate();
+                
+                query = "update Orders set delivered = ? where orderid = ?";
+                myStmt=this.myConn.prepareStatement(query);
+                myStmt.setBoolean(1, this.isReached());
+                myStmt.setInt(2, this.getOrderid());
+                myStmt.executeUpdate();
             }
             catch(SQLException e)
             {
                 e.printStackTrace();
             }
+        }
+
+        public boolean isReached() {
+            return reached;
+        }
+
+        public void setReached(boolean reached) {
+            this.reached = reached;
         }
         
 	public String getTrackingdetail() {

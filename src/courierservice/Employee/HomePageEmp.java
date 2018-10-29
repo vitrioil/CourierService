@@ -6,6 +6,7 @@
 package courierservice.Employee;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXPopup;
@@ -109,6 +110,10 @@ public class HomePageEmp extends Application{
         textAreaOtherDetails.setTextFormatter(new TextFormatter<String>(change -> 
                 change.getControlNewText().length() <= intMaxCharLimit ? change : null));
         
+        JFXCheckBox checkReached = new JFXCheckBox("Reached the destination");
+        checkReached.setSelected(false);
+        checkReached.setAllowIndeterminate(false);
+        
         JFXButton buttonConfirm = new JFXButton("Confirm");
         
         buttonConfirm.setOnAction(e -> {
@@ -119,7 +124,11 @@ public class HomePageEmp extends Application{
                 String location = textFieldLocation.getText();
                 String otherDetails = textAreaOtherDetails.getText();
                 LocalDateTime now = LocalDateTime.now();
-                
+                boolean reached = checkReached.isSelected();
+                if (reached)
+                {
+                    location += "-> Reached!";
+                }
                 /*
                 int hour = now.getHour();
                 int minute = now.getMinute();
@@ -148,6 +157,7 @@ public class HomePageEmp extends Application{
                     System.out.println(location);
                     tracking.setTrackingdetail(location);
                     tracking.setEmployeeid(primaryEmployee.getEmployeeid());
+                    tracking.setReached(reached);
                     tracking.updateTracking();
                 }
                 
@@ -159,6 +169,7 @@ public class HomePageEmp extends Application{
                     textFieldOrderID,
                     textFieldUserID,
                     textFieldLocation,
+                    checkReached,
                     textAreaOtherDetails,
                     buttonConfirm
         );
@@ -201,7 +212,7 @@ public class HomePageEmp extends Application{
             }
         });
         
-        JFXTreeTableColumn<Payment, String> tableColumnTime = new JFXTreeTableColumn<>("Date");
+        JFXTreeTableColumn<Payment, String> tableColumnTime = new JFXTreeTableColumn<>("Time");
         tableColumnTime.setPrefWidth(300);
         tableColumnTime.setStyle("-fx-background-color: black;-fx-text-fill:white");
         tableColumnTime.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {

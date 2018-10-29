@@ -608,7 +608,7 @@ public class HomePage extends Application {
                 if (empty || item == null || item.getDetails()== null) {
                     setText(null);
                 } else {
-                    setText(item.getDetails());
+                    setText(item.getOrderName());
                 }
             }
         });
