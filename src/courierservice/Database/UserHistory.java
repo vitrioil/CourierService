@@ -4,18 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class userhistory {
+public class UserHistory {
 	static Connection myConn;
 	static PreparedStatement myStmt;
 	
 	private int userid,orderid,price;
 	private String courierTime;
 	
-	public userhistory(Connection myConn) {
+	public UserHistory(Connection myConn) {
 		this.myConn=myConn;
 	}
 	
-	public userhistory(int userid, int orderid, int price, Connection myConn) {
+	public UserHistory(int userid, int orderid, int price, Connection myConn) {
 		this(myConn);
 		this.userid=userid;this.orderid=orderid;this.price=price;
 	}

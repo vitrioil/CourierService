@@ -11,26 +11,31 @@ public class Order {
 	static PreparedStatement myStmt;
 	
 	private int orderid;
-	private String source,destination,deliveryType,details;
+	private String source,destination,deliveryType,details,orderName;
+
+        
 	private Time pickupTime;
+        
+        private boolean assigned=false,delivered=false,paid=false;
         
 	public Order(Connection myConn) {
 		this.myConn=myConn;
 	}
 	
 	public Order(String source, String destination, String deliveryType, String details,
-                Time pickupTime, Connection myConn) {
+                Time pickupTime, String OrderName, Connection myConn) {
 		this(myConn);
 		this.setSource(source);this.setDestination(destination);this.setPickupTime(pickupTime);
-		this.setDeliveryType(deliveryType);this.setDetails(details);
+		this.setDeliveryType(deliveryType);this.setDetails(details);this.setOrderName(OrderName);
 	}
 	
 	public boolean insertOrder(int userid) {
                 int orderid = getMaxOrderID() + 1;
                 this.setOrderid(orderid);
 		try {
-			myStmt = myConn.prepareStatement("insert into Orders (userid, orderid, destination,source,deliverytype,details,pickuptime)" 
-					+ "values (?,?,?,?,?,?,?)" );
+			myStmt = myConn.prepareStatement("insert into Orders (userid, orderid, destination,source,"
+                                + "deliverytype,details,pickuptime,ordername)" 
+					+ "values (?,?,?,?,?,?,?,?)" );
 			myStmt.setInt(1, userid);
 			myStmt.setInt(2, this.getOrderid());
 			myStmt.setString(3, this.getDestination());
@@ -38,6 +43,7 @@ public class Order {
 			myStmt.setString(5, this.getDeliveryType());
 			myStmt.setString(6, this.getDetails());
 			myStmt.setTime(7, this.getPickupTime());
+			myStmt.setString(8, this.getOrderName());
 			myStmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
@@ -69,6 +75,27 @@ public class Order {
             }
         }
         
+        public static int getPrice(int orderid, Connection myConn)
+        {
+            int price = -1;
+            ResultSet myRs;
+            try{
+                String query = "select price from userhistory where orderid = ?";
+                myStmt = myConn.prepareStatement(query);
+                myStmt.setInt(1, orderid);
+                myRs = myStmt.executeQuery();
+                while(myRs.next())
+                {
+                    price = myRs.getInt("price");
+                }
+            }
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }
+            return price;
+        }
+        
 	/*public Order(String email,String password) {
 		/*convert password string to hash pass here 
 		ResultSet myRs;
@@ -92,7 +119,13 @@ public class Order {
 		}
 	}*/
        
-        
+        public String getOrderName() {
+            return orderName;
+        }
+
+        public void setOrderName(String orderName) {
+            this.orderName = orderName;
+        }
 	public int getOrderid() {
 		return orderid;
 	}
@@ -140,4 +173,27 @@ public class Order {
 	public void setDetails(String details) {
 		this.details = details;
 	}
+        public boolean isAssigned() {
+            return assigned;
+        }
+
+        public void setAssigned(boolean assigned) {
+            this.assigned = assigned;
+        }
+
+        public boolean isDelivered() {
+            return delivered;
+        }
+
+        public void setDelivered(boolean delivered) {
+            this.delivered = delivered;
+        }
+
+        public boolean isPaid() {
+            return paid;
+        }
+
+        public void setPaid(boolean paid) {
+            this.paid = paid;
+        }
 }

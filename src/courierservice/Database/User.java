@@ -138,7 +138,7 @@ public class User {
             ResultSet rs;
             ArrayList<Order> arrayListOrder = new ArrayList<>();
             try {
-			String query = "select orderid,source,destination,deliverytype,details,pickuptime"
+			String query = "select ordername,orderid,source,destination,deliverytype,details,pickuptime"
                                 + " from Orders inner join users where users.userid = ?" ;
                         myStmt = this.myConn.prepareStatement(query);
                         myStmt.setInt(1, this.getUserid());
@@ -150,9 +150,11 @@ public class User {
                                               rs.getString("deliverytype"),
                                               rs.getString("details"),
                                               rs.getTime("pickuptime"),
+                                              rs.getString("ordername"),
                                               this.myConn
                             );
                             order.setOrderid(rs.getInt("orderid"));
+                            System.out.println(order.getOrderName());
                             arrayListOrder.add(order);
                         }
                 } catch (SQLException e) {

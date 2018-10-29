@@ -201,6 +201,9 @@ public class HomePage extends Application {
             //Add a listener so that button toggles the visibility of the source text field
             textFieldSourceAddress.setVisible(!textFieldSourceAddress.isVisible());
         });
+        JFXTextField textFieldOrderName = new JFXTextField();
+        textFieldOrderName.setPromptText("Order name");
+        textFieldOrderName.setPrefWidth(500);
         
         JFXTextField textFieldName = new JFXTextField();
         textFieldName.setPromptText("Package name");
@@ -321,6 +324,7 @@ public class HomePage extends Application {
             String minute = Integer.toString(timePicker.getValue().getMinute());
             java.sql.Time time = java.sql.Time.valueOf(hour+":"+minute+":00");
             String destinationAddress = textFieldDestinationAddress.getText();
+            String orderName = textFieldOrderName.getText();
             if(destinationAddress.trim().isEmpty())
             {
                 JFXPopup popup = Login.showPopup("Please fill the destination address");
@@ -345,6 +349,13 @@ public class HomePage extends Application {
             }
             //All clear get details 
             
+            if(orderName.trim().isEmpty())
+            {
+                JFXPopup popup = Login.showPopup("Please enter order name");
+                popup.show(textFieldOrderName, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                enterOrder = false;
+            }
+            
             String typeDelivery = ((JFXRadioButton)groupTypeDelivery.getSelectedToggle()).getText();
             String details = textAreaOtherDetails.getText();
             
@@ -361,6 +372,8 @@ public class HomePage extends Application {
 	               textFieldSourceAddress.setEditable(false);
 		       textFieldDestinationAddress.setEditable(false);
 		       textAreaOtherDetails.setEditable(false);
+                       textFieldOrderName.setEditable(false);
+                       
                        groupTypeDelivery.getToggles().forEach(t -> {
                                 Node node = (Node) t;
                                 node.setDisable(true);
@@ -373,6 +386,8 @@ public class HomePage extends Application {
 	               textFieldSourceAddress.setEditable(true);
 		       textFieldDestinationAddress.setEditable(true);
 		       textAreaOtherDetails.setEditable(true); 
+                       textFieldOrderName.setEditable(true);
+
                        groupTypeDelivery.getToggles().forEach(t -> {
                                 Node node = (Node) t;
                                 node.setDisable(false);
@@ -381,7 +396,7 @@ public class HomePage extends Application {
 		});
 
 		buttonConfirmOrder.setOnAction( ev -> {
-                       order = new Order(sourceAddress, destinationAddress, typeDelivery, details, time, primaryConn);
+                       order = new Order(sourceAddress, destinationAddress, typeDelivery, details, time, orderName,primaryConn);
                        boolean orderCheck = order.insertOrder(primaryUser.getUserid());
                        int orderID = order.getOrderid();
                        for(Package p: listPackage)
@@ -394,6 +409,8 @@ public class HomePage extends Application {
 	               textFieldSourceAddress.setEditable(true);
 		       textFieldDestinationAddress.setEditable(true);
 		       textAreaOtherDetails.setEditable(true); 
+                       textFieldOrderName.setEditable(true);
+
                        groupTypeDelivery.getToggles().forEach(t -> {
                                 Node node = (Node) t;
                                 node.setDisable(false);
@@ -411,6 +428,7 @@ public class HomePage extends Application {
                 textFieldDestinationAddress,
                 textFieldSourceAddress,
                 checkBoxEnableSourceAddress,
+                textFieldOrderName,
                 textFieldName,
                 labelTypePackage, 
                 hBoxTypePackage,
@@ -436,22 +454,37 @@ public class HomePage extends Application {
                Database support here!
                ======================
         */
-        GridPane gridOrderDetails = new GridPane();
+        GridPane gridOrderDetails = sampleGridPane();
+        gridOrderDetails.setPadding(new Insets(10, 10, 10, 10));
         int orderID = orderSelected.getOrderid();
         ArrayList<Package> listPackage  = Package.getPackages(orderID, primaryConn);
      /*   
         HashMap<String, Label> orderDetails = orderSelected.getDetails();
         */
         VBox vBox = new VBox();
-        
+        vBox.setSpacing(10);
+        vBox.getChildren().addAll(new Label("Your order consisted of:"),
+                                   new Separator(),new Label(""));
         for(Package p: listPackage)
         {
-           vBox.getChildren().add(new Label(""));
+           vBox.getChildren().addAll(new Label("Package Name: " + p.getPackageName()),
+                   new Label("Package Type: " + p.getPackageType()),
+                   new Separator());
         }
-        
+        int price = Order.getPrice(orderSelected.getOrderid(), primaryConn);
+        vBox.getChildren().addAll(new Label("Your order's cost was: " + Integer.toString(price)));
         gridOrderDetails.getChildren().addAll(vBox);
         
         return gridOrderDetails;
+    }
+    
+   
+    public ObservableList<Order> getOrders()
+    {
+        ArrayList<Order> orderArrayList = primaryUser.getOrder();
+        ObservableList<Order> orderList = FXCollections.observableArrayList(orderArrayList);
+        
+        return orderList;
     }
     
     public void historyTabScene()
@@ -464,13 +497,8 @@ public class HomePage extends Application {
 
         Label labelHistory = new Label("Check your history of couriers here!");
         
-        /*
-                Add random data for now
-               ======================
-               Database support here!
-               ======================
-        */
-        ObservableList<Order> orderList = FXCollections.observableArrayList();
+        
+        ObservableList<Order> orderList = getOrders();
         ListView<Order> listViewOrder = new ListView<Order>(orderList);
         listViewOrder.getSelectionModel().select(0);
         
@@ -483,19 +511,20 @@ public class HomePage extends Application {
                 if (empty || item == null || item.getDetails()== null) {
                     setText(null);
                 } else {
-                    setText(item.getDetails());
+                    setText(item.getOrderName());
                 }
             }
         });
         listViewOrder.setPrefSize(500, 200);
 
         JFXButton buttonGetDetails = new JFXButton("Find");        
+        JFXButton buttonRefresh = new JFXButton("Refresh");        
         
         //Flow pane is used here for the drawer pane (slider)
         FlowPane flowPane = new FlowPane();
         flowPane.setHgap(10);
         
-        flowPane.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails);
+        flowPane.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails, buttonRefresh);
         flowPane.setMaxSize(200, 200);
         
         JFXDrawer rightDrawer = new JFXDrawer();
@@ -522,6 +551,10 @@ public class HomePage extends Application {
             
         });
         
+        buttonRefresh.setOnAction(e -> {
+                listViewOrder.getItems().clear();
+                listViewOrder.getItems().addAll(getOrders());
+        });
         
         HBox hBox = new HBox();
         hBox.setSpacing(10);
@@ -533,7 +566,7 @@ public class HomePage extends Application {
         history.setContent(gPane);
     }
         
-    private String[] getLocation(Order order)
+    private ArrayList<String> getLocation(Order order)
     {
         //Write the part which gets location history 
         //from database
@@ -541,16 +574,15 @@ public class HomePage extends Application {
         Tracking track = new Tracking(primaryUser.getUserid(), order.getOrderid(), primaryConn);
         HashMap<String, String> trackingDetails = track.getOrderDetails();
         System.out.println(trackingDetails.get("Details"));
-        String locationHistory[] = trackingDetails.get("Details").split(TRACKING_DELIMITER);
+        ArrayList<String> locationHistory =  new ArrayList<String>();
+        
+        while(!(trackingDetails.get("Details") == null))
+        {
+        }
         return locationHistory;
+        
     }
     
-    public ObservableList<Order> getOrders()
-    {
-        ArrayList<Order> orderArrayList = primaryUser.getOrder();
-        ObservableList<Order> orderList = FXCollections.observableArrayList(orderArrayList);
-        return orderList;
-    }
     
     public void trackingTabScene()
     {
@@ -585,7 +617,7 @@ public class HomePage extends Application {
         // For now display text viz. the last known address of the order
         listViewOrder.setOnMouseClicked( e-> {
                 Order orderSelected = listViewOrder.getSelectionModel().getSelectedItem();
-                String[] locationStringList = getLocation(orderSelected);
+                ArrayList<String> locationStringList = getLocation(orderSelected);
                 listViewLoc.getItems().clear();
                 for(String loc: locationStringList)
                 {

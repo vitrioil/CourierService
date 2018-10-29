@@ -15,10 +15,11 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import courierservice.Database.Employee;
+import courierservice.Database.Tracking;
 import courierservice.HomePage;
-import courierservice.Login;
+import java.sql.Connection;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -48,6 +49,8 @@ import javafx.stage.Stage;
  */
 public class HomePageEmp extends Application{
     Stage primaryStage;
+    Employee primaryEmployee;
+    Connection primaryConn;
     
     BorderPane borderPane;
     
@@ -109,8 +112,10 @@ public class HomePageEmp extends Application{
         JFXButton buttonConfirm = new JFXButton("Confirm");
         
         buttonConfirm.setOnAction(e -> {
-                String userID = textFieldUserID.getText();
-                String orderID = textFieldOrderID.getText();
+                boolean sendFlag = true;
+               
+                String userIDText = textFieldUserID.getText();
+                String orderIDText = textFieldOrderID.getText();
                 String location = textFieldLocation.getText();
                 String otherDetails = textAreaOtherDetails.getText();
                 LocalDateTime now = LocalDateTime.now();
@@ -122,27 +127,29 @@ public class HomePageEmp extends Application{
                 int day = now.getDayOfMonth();
                 int year = now.getYear();
                 */
-                /*
-                        =====================
-                        Database support here
-                        =====================
-                        To get employee id
-                */
                 
-                if (orderID.trim().isEmpty()) {
+                
+                if (orderIDText.trim().isEmpty()) {
                     JFXPopup popup = showPopup("Order ID cannot be empty");
                     popup.show(textFieldOrderID, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
-            }
+                    sendFlag = false;
+                }
                 if (location.trim().isEmpty()) {
                     JFXPopup popup = showPopup("Location cannot be empty");
                     popup.show(textFieldLocation, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
-            }
-                /*
-                        =====================
-                        Database support here
-                        =====================
-                        To send notification
-                */
+                    sendFlag = false;
+                }
+                if(sendFlag)
+                {
+                    System.out.println("Sending");
+                    int userID = Integer.parseInt(userIDText);
+                    int orderID = Integer.parseInt(orderIDText);
+                    Tracking tracking = new Tracking(userID, orderID, primaryConn);
+                    System.out.println(location);
+                    tracking.setTrackingdetail(location);
+                    tracking.setEmployeeid(primaryEmployee.getEmployeeid());
+                    tracking.updateTracking();
+                }
                 
         });
         
@@ -163,17 +170,7 @@ public class HomePageEmp extends Application{
     
     ObservableList<Payment> getPendingPayment()
     {
-        /*
-                =====================
-                Database support here
-                =====================
-        */
-        ObservableList<Payment> listPayments = FXCollections.observableArrayList();
-        listPayments.add(new Payment("1234", "1000","2018-10-10","abcd"));
-        listPayments.add(new Payment("5678", "2000","2018-10-10","efgh"));
-        listPayments.add(new Payment("9101", "3000","2018-10-10","ijkl"));
-        listPayments.add(new Payment("1121", "4000","2018-10-10","mnop"));
-        listPayments.add(new Payment("3141", "5000","2018-10-10","qrst"));
+        ObservableList<Payment> listPayments = FXCollections.observableArrayList(primaryEmployee.getPendingPayments());
         
         return listPayments;
     }
@@ -276,9 +273,11 @@ public class HomePageEmp extends Application{
         return gridPane;
     }
     
-    BorderPane makeScene(Stage newStage)
+    BorderPane makeScene(Stage newStage, Employee newEmployee, Connection newConnection)
     {
         primaryStage = newStage;
+        primaryEmployee = newEmployee;
+        primaryConn = newConnection;
         
         BorderPane borderPane = new BorderPane();
         
@@ -355,7 +354,7 @@ public class HomePageEmp extends Application{
     @Override
     public void start(Stage stage) { 
         primaryStage = stage;
-        borderPane = makeScene(primaryStage);
+        borderPane = makeScene(primaryStage, primaryEmployee, primaryConn);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 

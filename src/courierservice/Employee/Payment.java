@@ -6,8 +6,11 @@
 package courierservice.Employee;
 
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -21,11 +24,24 @@ public final class Payment extends RecursiveTreeObject<Payment>{
     final StringProperty time;
     final StringProperty customerID;
 
+    Connection myConn;
+    static PreparedStatement myStmt;
+    
+    
     public Payment(String orderID, String price, String time, String customerID) {
         this.orderID = new SimpleStringProperty(orderID);
         this.price = new SimpleStringProperty(price);
         this.time = new SimpleStringProperty(time);
         this.customerID = new SimpleStringProperty(customerID);
+    }
+    
+
+    public Connection getMyConn() {
+        return myConn;
+    }
+
+    public void setMyConn(Connection myConn) {
+        this.myConn = myConn;
     }
    
 }

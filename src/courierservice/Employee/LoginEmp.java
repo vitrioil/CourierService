@@ -9,8 +9,13 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
+import courierservice.Database.Employee;
+import courierservice.Database.UserNotFoundException;
 import courierservice.HomePage;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.HPos;
@@ -40,11 +45,24 @@ public class LoginEmp extends Application{
     //Hashmap to pass mapping from stage to borderpane
     HashMap<Stage, BorderPane> mapStagePane = new HashMap<Stage, BorderPane>();
     
-    JFXTextField textFieldUserName;
+    JFXTextField textFieldEmail;
     JFXPasswordField textFieldPassword;
     JFXButton buttonLogin;
     JFXButton buttonSign;
     JFXButton buttonExit;
+    
+    Connection primaryConn;
+    
+    String urlConn="jdbc:mysql://localhost:3306/Courier";
+    String userConn="vitrioil";
+    String passwordConn="vitrioil";
+    
+    String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+ 
+                            "[a-zA-Z0-9_+&*-]+)*@" + 
+                            "(?:[a-zA-Z0-9-]+\\.)+[a-z" + 
+                            "A-Z]{2,7}$";
+    Pattern  pattern = Pattern.compile(emailRegex);
+
             
     static JFXPopup showPopup(String message)
     {
@@ -56,29 +74,27 @@ public class LoginEmp extends Application{
         return popup;
     }
     
-    boolean verifyLogin()
+    boolean verifyLogin(String userEmail, String password)
     {
-        String userName = textFieldUserName.getText();
-        System.out.println("Username:"+userName+" welcome");
-        if (userName.trim().isEmpty())
+        System.out.println("Username:"+userEmail+" welcome");
+        if(!pattern.matcher(userEmail).matches())
         {
-            JFXPopup popup = showPopup("No user name entered");
-            popup.show(textFieldUserName, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+            JFXPopup popup = showPopup("Invalid email address");
+            popup.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
             return false;
         }
-        String password = textFieldPassword.getText();
+        if (userEmail.trim().isEmpty())
+        {
+            JFXPopup popup = showPopup("No user name entered");
+            popup.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+            return false;
+        }
         if(password.trim().isEmpty())
         {
           JFXPopup popup = showPopup("Please enter password");
           popup.show(textFieldPassword, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
           return false;
         }
-        /*
- 			=====================
-			Database support here
-			=====================
-                          verify
-        */
         return true;
     }
     
@@ -111,9 +127,9 @@ public class LoginEmp extends Application{
         Label labelLogin = new Label("Log in");
         labelLogin.setMaxWidth(Double.MAX_VALUE);
         
-        textFieldUserName = new JFXTextField();
-        textFieldUserName.setPromptText("User Name");
-        textFieldUserName.setMaxWidth(Double.MAX_VALUE);
+        textFieldEmail = new JFXTextField();
+        textFieldEmail.setPromptText("Email");
+        textFieldEmail.setMaxWidth(Double.MAX_VALUE);
         
         textFieldPassword = new JFXPasswordField();
         textFieldPassword.setPromptText("Password");
@@ -123,19 +139,28 @@ public class LoginEmp extends Application{
         buttonExit = new JFXButton("Exit");
         
         buttonLogin.setOnAction( e -> {
-                //Add validation here
-		/*
-			=====================
-			Database support here
-			=====================
-		*/
-                boolean loginEnter = verifyLogin();
+                String employeeEmail = textFieldEmail.getText();
+                String employeePassword = textFieldPassword.getText();
+                boolean loginEnter = verifyLogin(employeeEmail, employeePassword);
                 
                 // verify password
                 if (loginEnter)
                 {
-                    HomePageEmp homePage = new HomePageEmp();
-                    primaryStage.getScene().setRoot(homePage.makeScene(newStage));
+                    Employee employee;
+                    try{
+                        employee = new Employee(employeeEmail, employeePassword, primaryConn);
+                        HomePageEmp homePage = new HomePageEmp();
+                        primaryStage.getScene().setRoot(homePage.makeScene(primaryStage, employee, primaryConn));
+                    }
+                    catch(UserNotFoundException uExc)
+                    {
+                        JFXPopup errPopup = showPopup(uExc.getMessage());
+                        errPopup.show(textFieldEmail,  JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                    }
+                    catch(Exception exc){
+                        exc.printStackTrace();
+                    }
+                    
                 }
                 
         });
@@ -148,13 +173,12 @@ public class LoginEmp extends Application{
         VBox vBox = new VBox();
         vBox.setSpacing(10);
         
-        VBox.setVgrow(textFieldUserName, Priority.ALWAYS);
+        VBox.setVgrow(textFieldEmail, Priority.ALWAYS);
         VBox.setVgrow(textFieldPassword, Priority.ALWAYS);
         VBox.setVgrow(buttonLogin, Priority.ALWAYS);
         
-        vBox.getChildren().addAll(
-                    labelLogin,
-                    textFieldUserName,
+        vBox.getChildren().addAll(labelLogin,
+                    textFieldEmail,
                     textFieldPassword,
                     buttonLogin
         );
@@ -170,6 +194,13 @@ public class LoginEmp extends Application{
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
+        try{
+            Class.forName("org.mariadb.jdbc.Driver");
+            primaryConn=DriverManager.getConnection(urlConn,userConn,passwordConn);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
         mapStagePane = makeScene(primaryStage);
         Scene scene = new Scene(mapStagePane.get(primaryStage), 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
