@@ -11,7 +11,6 @@ import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
 import courierservice.Database.User;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.regex.Pattern;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -224,9 +223,16 @@ public class SignUp extends Application{
                     user = new User(userName, userEmail,userPassword,userAddress,userPhone,primaryConn);
                     if (signUpEnter)
                     {
-                        user.insertUser();
-                        HomePage homePage = new HomePage();
-                        primaryStage.getScene().setRoot(homePage.makeScene(newStage, user, primaryConn));
+                        if(user.insertUser())
+                        {
+                            System.out.println("User created");;
+                            HomePage homePage = new HomePage();
+                            primaryStage.getScene().setRoot(homePage.makeScene(newStage, user, primaryConn));
+                        }
+                        else{
+                            JFXPopup userExists = Login.showPopup("User Exists!");
+                            userExists.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+                        }
                     }
                 }
                 catch(Exception exc){

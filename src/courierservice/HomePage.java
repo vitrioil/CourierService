@@ -446,15 +446,12 @@ public class HomePage extends Application {
     
     public GridPane getOrderDetails(Order orderSelected, JFXButton showDetails)
     {
-        /*
-            Get the order from the Order object and 
-            Display every detail
         
-               ======================
-               Database support here!
-               ======================
-        */
         GridPane gridOrderDetails = sampleGridPane();
+        if(orderSelected == null)
+        {
+            return gridOrderDetails;
+        }
         gridOrderDetails.setPadding(new Insets(10, 10, 10, 10));
         int orderID = orderSelected.getOrderid();
         ArrayList<Package> listPackage  = Package.getPackages(orderID, primaryConn);
@@ -472,7 +469,12 @@ public class HomePage extends Application {
                    new Separator());
         }
         int price = Order.getPrice(orderSelected.getOrderid(), primaryConn);
-        vBox.getChildren().addAll(new Label("Your order's cost was: " + Integer.toString(price)));
+        String priceText = "Price not decided!";
+        if(price != -1)
+        {
+            priceText = Integer.toString(price);
+        }
+        vBox.getChildren().addAll(new Label("Your order's cost was: " + priceText));
         gridOrderDetails.getChildren().addAll(vBox);
         
         return gridOrderDetails;
@@ -575,9 +577,11 @@ public class HomePage extends Application {
         HashMap<String, String> trackingDetails = track.getOrderDetails();
         System.out.println(trackingDetails.get("Details"));
         ArrayList<String> locationHistory =  new ArrayList<String>();
-        
-        while(!(trackingDetails.get("Details") == null))
+        int i=0;
+        while(!(trackingDetails.get("Details:"+Integer.toString(i)) == null))
         {
+            locationHistory.add(trackingDetails.get("Details:"+Integer.toString(i)));
+            i += 1;
         }
         return locationHistory;
         

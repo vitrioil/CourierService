@@ -45,11 +45,19 @@ public class Order {
 			myStmt.setTime(7, this.getPickupTime());
 			myStmt.setString(8, this.getOrderName());
 			myStmt.executeUpdate();
+                        
+                        myStmt = myConn.prepareStatement("insert into userhistory (userid, orderid, price)" 
+					+ "values (?,?,?)" );
+			myStmt.setInt(1, userid);
+			myStmt.setInt(2, this.getOrderid());
+			myStmt.setInt(3, -1);
+			myStmt.executeUpdate();
 			return true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+                
 		return false;
 	}
 	

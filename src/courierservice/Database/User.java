@@ -29,10 +29,6 @@ public class User {
 	}
 		
 	public boolean insertUser() {
-                if(checkUserExists(this.email))
-                {
-                    return false;
-                }
 		try {
 			
 			myStmt = myConn.prepareStatement("insert into users (username,email,password,sourceaddress,phone) values (?,?,?,?,?)" );
@@ -43,6 +39,17 @@ public class User {
 			myStmt.setString(4, this.getSourceAddress());
 			myStmt.setString(5, this.getPhone());
 			myStmt.executeUpdate();
+                        
+                        myStmt = myConn.prepareStatement("select userid from users where email=?");
+                        
+                        myStmt.setString(1, this.getEmail());
+                        
+                        ResultSet rs;
+                        rs = myStmt.executeQuery();
+                        while(rs.next())
+                        {
+                            this.setUserid(rs.getInt("userid"));
+                        }
 			return true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -55,20 +62,16 @@ public class User {
         {
             ResultSet myRs;
             try {
-                    String query="select userid,username,email,password,sourceAddress,phone"
+                    String query="select email"
                             + " from users where email = ?";
                     myStmt=this.myConn.prepareStatement(query);
                     myStmt.setString(1, email);
                     myRs = myStmt.executeQuery();
+                    String temp_email = "";
                     while(myRs.next() ) {
-                            this.userid=(int)myRs.getLong("userid");
-                            this.username=myRs.getString("username");
-                            this.email=myRs.getString("email");
-                            this.password=myRs.getString("password");
-                            this.sourceAddress=myRs.getString("sourceaddress");
-                            this.phone=myRs.getString("phone") ;
+                            temp_email=myRs.getString("email");
                     }
-                    if(this.email == null)
+                    if(temp_email == null)
                     {
                         return false;
                     }
