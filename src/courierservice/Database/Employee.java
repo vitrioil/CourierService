@@ -25,14 +25,16 @@ public class Employee {
 		this.myConn=myConn;
 	}
 	
-	public Employee(String employeename, String phone,String address,String gender,Boolean available, Connection myConn) {
+	public Employee(String employeename, String phone,String address,Boolean available, Connection myConn) {
 		this(myConn);
-		this.setEmployeename(employeename);this.setPhone(phone);this.setAddress(address);this.setGender(gender);
+		this.setEmployeename(employeename);this.setPhone(phone);this.setAddress(address);
 		this.available=available;
 	}
 	
+        
+        
         public Employee(String email,String password, Connection myConn) throws UserNotFoundException{
-		/*convert password string to hash pass here */
+	
                 password = get_SHA_512_SecurePassword(password, this.salt);
 		ResultSet myRs;
                 this.myConn = myConn;
@@ -112,7 +114,7 @@ public class Employee {
         ArrayList<Payment> listPayment = new ArrayList<>();
         try{
             String query = "select distinct userhistory.price,userhistory.couriertime,userhistory.userid,userhistory.orderid from"
-                    + " userhistory inner join Orders inner join tracking where tracking.employeeid = ?";
+                    + " userhistory inner join Orders inner join tracking where tracking.employeeid = ? and Orders.paid = 0";
             myStmt = this.myConn.prepareStatement(query);
             myStmt.setInt(1, this.getEmployeeid());
             myRs = myStmt.executeQuery();

@@ -369,7 +369,7 @@ public class HomePageAdmin extends Application {
     	/*query db for the list of all orders of every user*/
     	try{
     		st=primaryConn.createStatement();
-            ResultSet myRs=st.executeQuery("select * from Orders where assigned=0");
+            ResultSet myRs=st.executeQuery("select * from Orders where assigned=0 and paid = 0");
     		//myStmt.executeQuery("CREATE TABLE IF NOT EXISTS `test` (id int ) ");
             System.out.println("query executed");
     		while(myRs.next() ) {
@@ -395,23 +395,23 @@ public class HomePageAdmin extends Application {
     	table.setEditable(true);
 
     	TableColumn<Order,String> sourceCol = new TableColumn<>("Source");
-    	sourceCol.setMinWidth(100);
+    	sourceCol.setMinWidth(200);
     	sourceCol.setCellValueFactory(
     			new PropertyValueFactory<>("source"));
     	
 
     	TableColumn<Order,String> destCol = new TableColumn<>("Destination");
-    	destCol.setMinWidth(100);
+    	destCol.setMinWidth(200);
     	destCol.setCellValueFactory(
     			new PropertyValueFactory<>("destination"));
     	
     	TableColumn<Order,String> delTypeCol = new TableColumn<>("Delivery Type");
-    	delTypeCol.setMinWidth(100);
+    	delTypeCol.setMinWidth(150);
     	delTypeCol.setCellValueFactory(
     			new PropertyValueFactory<>("deliveryType"));
     	
     	TableColumn<Order,String> detCol = new TableColumn<>("Details");
-    	detCol.setMinWidth(100);
+    	detCol.setMinWidth(250);
     	detCol.setCellValueFactory(
     			new PropertyValueFactory<>("details"));
     	
@@ -541,7 +541,7 @@ public class HomePageAdmin extends Application {
 				String s=myRs.getString("employeename");String p=myRs.getString("password");
 				String ph=myRs.getString("phone");
 				String addr=myRs.getString("address");
-				Employee e=new Employee(s,p,ph,addr,true,null);
+				Employee e=new Employee(s,ph,addr,myRs.getBoolean("available"),null);
 				HomePageAdmin.list_employee.add(e);
 				//System.out.println(  "name: "+n/*(new java.util.Date(myRs.getTimestamp("created_at").getTime())).toString()*/ );
 			}
@@ -557,7 +557,7 @@ public class HomePageAdmin extends Application {
     	table.setEditable(true);
 
     	TableColumn<Employee,String> sourceCol = new TableColumn<>("Employee Name");
-    	sourceCol.setMinWidth(100);
+    	sourceCol.setMinWidth(250);
     	sourceCol.setCellValueFactory(
     			new PropertyValueFactory<>("employeename"));
     	sourceCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -575,7 +575,7 @@ public class HomePageAdmin extends Application {
     	);
     	
     	TableColumn<Employee,String> passCol = new TableColumn<>("Password");
-    	passCol.setMinWidth(100);
+    	passCol.setMinWidth(250);
     	passCol.setCellValueFactory(
     			new PropertyValueFactory<>("password"));
     	passCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -591,7 +591,7 @@ public class HomePageAdmin extends Application {
     	);
 
     	TableColumn<Employee,String> destCol = new TableColumn<>("Phone");
-    	destCol.setMinWidth(100);
+    	destCol.setMinWidth(250);
     	destCol.setCellValueFactory(
     			new PropertyValueFactory<>("phone"));
     	destCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -607,7 +607,7 @@ public class HomePageAdmin extends Application {
     	);
     	
     	TableColumn<Employee,String> addrCol = new TableColumn<>("Address");
-    	addrCol.setMinWidth(100);
+    	addrCol.setMinWidth(250);
     	addrCol.setCellValueFactory(
     			new PropertyValueFactory<>("address"));
     	addrCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -623,7 +623,7 @@ public class HomePageAdmin extends Application {
     	);
     	
     	TableColumn<Employee,Boolean> detCol = new TableColumn<>("Available");
-    	detCol.setMinWidth(100);
+    	detCol.setMinWidth(250);
     	detCol.setCellValueFactory(
     			new PropertyValueFactory<>("available"));
     	detCol.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter() ));
@@ -673,7 +673,7 @@ public class HomePageAdmin extends Application {
 	                    dialog.show();
 	                    return;				
     			}
-    			HomePageAdmin.data_emp.add(new Employee(e_name_tf.getText().toString(), pass_tf.getText().toString(), phone_tf.getText().toString(), addr_tf.getText().toString(),
+    			HomePageAdmin.data_emp.add(new Employee(e_name_tf.getText().toString(), phone_tf.getText().toString(), addr_tf.getText().toString(),
     						true,primaryConn));
     			try{
     		    	st=primaryConn.createStatement();
@@ -707,7 +707,7 @@ public class HomePageAdmin extends Application {
 
 
     	gPane.getChildren().addAll(vbox);
-    	addEmp.setContent(table);
+    	addEmp.setContent(gPane);
     }
     
     public BorderPane makeScene(Stage newStage,Connection mConn)

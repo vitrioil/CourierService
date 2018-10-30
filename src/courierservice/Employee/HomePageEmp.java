@@ -160,7 +160,7 @@ public class HomePageEmp extends Application{
                     tracking.updateTracking();
                     if(reached)
                     {
-                        tracking.updatePayment();
+                        tracking.updatePayment(primaryEmployee.getEmployeeid());
                     }
                 }
                 

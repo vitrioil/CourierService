@@ -85,12 +85,17 @@ public class Tracking {
             }
         }
         
-        public void updatePayment()
+        public void updatePayment(int employeeid)
         {
             try{
                 String query = "update Orders set assigned = 0 , paid = 1 where orderid = ?";
                 myStmt=this.myConn.prepareStatement(query);
                 myStmt.setInt(1, this.getOrderid());
+                myStmt.executeUpdate();
+                
+                query = "update employee set available = 1 where employeeid = ?";
+                myStmt=this.myConn.prepareStatement(query);
+                myStmt.setInt(1, employeeid);
                 myStmt.executeUpdate();
             }
             catch(SQLException e)

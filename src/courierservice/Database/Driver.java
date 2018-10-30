@@ -45,7 +45,7 @@ public class Driver {
 			//Order o=new Order("india","usa","sensitive","vinayak's gift card","12:00",myConn);
 		//	o.insertOrder();
 			
-			Employee e=new Employee("prem","0987654321","mumbai","male", true ,myConn);
+//			Employee e=new Employee("prem","0987654321","mumbai","male", true ,myConn);
 		//	e.insertEmployee();
 			
 			
