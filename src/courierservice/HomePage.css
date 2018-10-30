@@ -8,7 +8,7 @@
     -fx-my-menu-font-color: #FFFFFF;             /* Change according to your needs */
     -fx-my-menu-font-color-highlighted: #FFFFFF; /* Change according to your needs */
     -fx-theme-background-color: linear-gradient(#141a2e,#021e20);
-    -fx-theme-color: linear-gradient(#180815, #0a012e);/* #003333;*/
+    -fx-theme-color:  linear-gradient(#180815, #0a012e);/* #003333;*/
     -fx-prompt-text-color: gray;
 }
 
@@ -304,10 +304,13 @@ tree-table-view .column-header, .tree-table-view .filler {
     -fx-text-fill: white;
     -fx-alignment: center;
     -fx-opacity: 1;
-}*/
+}
+
+*/
+
 .table-view {
-    -fx-base: -fx-theme-background-color;
-    -fx-background-color: -fx-theme-background-color;
+   /* -fx-base: -fx-theme-background-color;
+    -fx-background-color: -fx-theme-background-color;*/
     -fx-control-inner-background: -fx-theme-background-color;
     -fx-table-cell-border-color: -fx-theme-background-color;
     -fx-table-header-border-color: -fx-theme-background-color;
@@ -322,7 +325,7 @@ tree-table-view .column-header, .tree-table-view .filler {
     -fx-size: 35;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: -fx-theme-background-color;
-    -fx-border-color: -fx-theme-background-color;/*transparent transparent derive(-fx-base, 80%) transparent;*/
+    -fx-border-color: -fx-theme-background-color;
     -fx-border-insets: 0 10 1 0;
 }
 
@@ -347,18 +350,12 @@ tree-table-view .column-header, .tree-table-view .filler {
     -fx-background-color: -fx-theme-background-color;
     -fx-background-insets: 0 0 0 0;
 }
+
 .table-row-cell {
     -fx-table-cell-border-color: -fx-theme-background-color;
 }
 
-.table-view {
-    -fx-base: -fx-theme-background-color;
-    -fx-background-color: -fx-theme-background-color;
-    -fx-control-inner-background: -fx-theme-background-color;
-    -fx-table-cell-border-color: -fx-theme-background-color;
-    -fx-table-header-border-color: -fx-theme-background-color;
-    -fx-padding: 5;
-}
+
 
 .table-view .column-header-background {
     -fx-background-color: -fx-theme-background-color;
@@ -367,7 +364,7 @@ tree-table-view .column-header, .tree-table-view .filler {
     -fx-size: 35;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: -fx-theme-background-color;
-    -fx-border-color: -fx-theme-background-color;/*transparent transparent derive(-fx-base, 80%) transparent;*/
+    -fx-border-color: -fx-theme-background-color;
     -fx-border-insets: 0 10 1 0;
 }
 
@@ -392,11 +389,12 @@ tree-table-view .column-header, .tree-table-view .filler {
     -fx-background-color: -fx-theme-background-color;
     -fx-background-insets: 0 0 0 0;
 }
+
 .table-row-cell {
     -fx-table-cell-border-color: -fx-theme-background-color;
 }
 
-.column-header-background {  -fx-padding: -1em; }
+.column-header-background {  -fx-padding: -0.5em; }
 .table-column {
   -fx-alignment: CENTER;
 }

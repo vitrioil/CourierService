@@ -144,7 +144,7 @@ public class HomePageAdmin extends Application {
                       labelOther
         );
         gridPaneHelpTypePackage.getChildren().addAll(vBoxLabel);
-        gridPaneHelpTypePackage.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;");
+       // gridPaneHelpTypePackage.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;");
         return gridPaneHelpTypePackage;
     }
     
@@ -167,7 +167,7 @@ public class HomePageAdmin extends Application {
                       labelNormal
         );
         gridPaneHelpTypeDelivery.getChildren().addAll(vBoxLabel);
-        gridPaneHelpTypeDelivery.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;"); 
+      //  gridPaneHelpTypeDelivery.setStyle("-fx-background-color:white;-fx-border-color: black;-fx-hgap:3;-fx-vgap:5;"); 
         return gridPaneHelpTypeDelivery;
     }
    
@@ -309,7 +309,7 @@ public class HomePageAdmin extends Application {
 			System.out.println(  "name: "+n/*(new java.util.Date(myRs.getTimestamp("created_at").getTime())).toString()*/ );
 		}
 		HomePageAdmin.data_clients= FXCollections.observableArrayList(HomePageAdmin.list_clients);
-    	TableView<User> table = new TableView<User>();
+    	TableView<User> table = new TableView<>();
     	
         
         final HBox hb = new HBox();
@@ -322,22 +322,22 @@ public class HomePageAdmin extends Application {
     	TableColumn firstNameCol = new TableColumn("First Name");
     	firstNameCol.setMinWidth(100);
     	firstNameCol.setCellValueFactory(
-    			new PropertyValueFactory<User, String>("username"));
+    			new PropertyValueFactory<>("username"));
 
     	TableColumn phoneCol = new TableColumn("phone");
     	phoneCol.setMinWidth(100);
     	phoneCol.setCellValueFactory(
-    			new PropertyValueFactory<User, String>("phone"));
+    			new PropertyValueFactory<>("phone"));
 
     	TableColumn emailCol = new TableColumn("Email");
     	emailCol.setMinWidth(200);
     	emailCol.setCellValueFactory(
-    			new PropertyValueFactory<User, String>("email"));
+    			new PropertyValueFactory<>("email"));
     	
     	TableColumn addrCol = new TableColumn("Address");
     	addrCol.setMinWidth(200);
     	addrCol.setCellValueFactory(
-    			new PropertyValueFactory<User, String>("sourceAddress"));
+    			new PropertyValueFactory<>("sourceAddress"));
 
     	table.setItems(HomePageAdmin.data_clients);
     	table.getColumns().addAll(firstNameCol, phoneCol, emailCol,addrCol);
@@ -364,7 +364,7 @@ public class HomePageAdmin extends Application {
     	gPane.getStyleClass().add("grid-pane");
     	Label labelTracking = new Label("Track your current order here!");
     	
-    	TableView<Order> table = new TableView<Order>();
+    	TableView<Order> table = new TableView<>();
     	
     	/*query db for the list of all orders of every user*/
     	try{
@@ -397,41 +397,41 @@ public class HomePageAdmin extends Application {
     	TableColumn<Order,String> sourceCol = new TableColumn<>("Source");
     	sourceCol.setMinWidth(100);
     	sourceCol.setCellValueFactory(
-    			new PropertyValueFactory<Order, String>("source"));
+    			new PropertyValueFactory<>("source"));
     	
 
     	TableColumn<Order,String> destCol = new TableColumn<>("Destination");
     	destCol.setMinWidth(100);
     	destCol.setCellValueFactory(
-    			new PropertyValueFactory<Order, String>("destination"));
+    			new PropertyValueFactory<>("destination"));
     	
     	TableColumn<Order,String> delTypeCol = new TableColumn<>("Delivery Type");
     	delTypeCol.setMinWidth(100);
     	delTypeCol.setCellValueFactory(
-    			new PropertyValueFactory<Order, String>("deliveryType"));
+    			new PropertyValueFactory<>("deliveryType"));
     	
     	TableColumn<Order,String> detCol = new TableColumn<>("Details");
     	detCol.setMinWidth(100);
     	detCol.setCellValueFactory(
-    			new PropertyValueFactory<Order, String>("details"));
+    			new PropertyValueFactory<>("details"));
     	
-    	TableColumn typeCountCol=new TableColumn("Counts of each Object Types");
+    	TableColumn<Order, Integer> typeCountCol=new TableColumn("Counts of each Object Types");
     	TableColumn fragileCol = new TableColumn("Fragile");
     	fragileCol.setMinWidth(50);
-    	fragileCol.setCellValueFactory(new PropertyValueFactory<Order,Integer>("fragileCount"));
-    	TableColumn durableCol = new TableColumn("Durable");
+    	fragileCol.setCellValueFactory(new PropertyValueFactory<>("fragileCount"));
+    	TableColumn<Order, Integer> durableCol = new TableColumn("Durable");
     	durableCol.setMinWidth(50);
-    	durableCol.setCellValueFactory(new PropertyValueFactory<Order,Integer>("durableCount"));
-    	TableColumn otherCol = new TableColumn("Other");
+    	durableCol.setCellValueFactory(new PropertyValueFactory<>("durableCount"));
+    	TableColumn<Order, Integer> otherCol = new TableColumn("Other");
     	otherCol.setMinWidth(50);
-    	otherCol.setCellValueFactory(new PropertyValueFactory<Order,Integer>("otherCount"));
+    	otherCol.setCellValueFactory(new PropertyValueFactory<>("otherCount"));
 
     	typeCountCol.getColumns().addAll(fragileCol, durableCol, otherCol );
 
     	TableColumn<Order,Integer> priceCol = new TableColumn<>("Price");
     	priceCol.setMinWidth(200);
     	priceCol.setCellValueFactory(
-    			new PropertyValueFactory<Order, Integer>("price"));
+    			new PropertyValueFactory<>("price"));
     	priceCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
     	priceCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Order, Integer>>() {
@@ -532,7 +532,7 @@ public class HomePageAdmin extends Application {
     	Label labelTracking = new Label("Add Employees here");
 
 
-    	TableView<Employee> table = new TableView<Employee>();
+    	TableView<Employee> table = new TableView<>();
     	
     	/*query db for the list of all orders of every user*/
 		try {
@@ -559,7 +559,7 @@ public class HomePageAdmin extends Application {
     	TableColumn<Employee,String> sourceCol = new TableColumn<>("Employee Name");
     	sourceCol.setMinWidth(100);
     	sourceCol.setCellValueFactory(
-    			new PropertyValueFactory<Employee, String>("employeename"));
+    			new PropertyValueFactory<>("employeename"));
     	sourceCol.setCellFactory(TextFieldTableCell.forTableColumn());
     	sourceCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Employee, String>>() {
@@ -577,7 +577,7 @@ public class HomePageAdmin extends Application {
     	TableColumn<Employee,String> passCol = new TableColumn<>("Password");
     	passCol.setMinWidth(100);
     	passCol.setCellValueFactory(
-    			new PropertyValueFactory<Employee, String>("password"));
+    			new PropertyValueFactory<>("password"));
     	passCol.setCellFactory(TextFieldTableCell.forTableColumn());
     	passCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Employee, String>>() {
@@ -593,7 +593,7 @@ public class HomePageAdmin extends Application {
     	TableColumn<Employee,String> destCol = new TableColumn<>("Phone");
     	destCol.setMinWidth(100);
     	destCol.setCellValueFactory(
-    			new PropertyValueFactory<Employee, String>("phone"));
+    			new PropertyValueFactory<>("phone"));
     	destCol.setCellFactory(TextFieldTableCell.forTableColumn());
     	destCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Employee, String>>() {
@@ -609,7 +609,7 @@ public class HomePageAdmin extends Application {
     	TableColumn<Employee,String> addrCol = new TableColumn<>("Address");
     	addrCol.setMinWidth(100);
     	addrCol.setCellValueFactory(
-    			new PropertyValueFactory<Employee, String>("address"));
+    			new PropertyValueFactory<>("address"));
     	addrCol.setCellFactory(TextFieldTableCell.forTableColumn());
     	addrCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Employee, String>>() {
@@ -625,7 +625,7 @@ public class HomePageAdmin extends Application {
     	TableColumn<Employee,Boolean> detCol = new TableColumn<>("Available");
     	detCol.setMinWidth(100);
     	detCol.setCellValueFactory(
-    			new PropertyValueFactory<Employee, Boolean>("available"));
+    			new PropertyValueFactory<>("available"));
     	detCol.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter() ));
     	detCol.setOnEditCommit(
     		new EventHandler<CellEditEvent<Employee, Boolean>>() {

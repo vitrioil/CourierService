@@ -101,7 +101,7 @@ public class Login extends Application{
         //borderPane.setPadding(new Insets(100, 100, 100, 100));
 
         GridPane gridPane = new GridPane();
-        //gridPane.getStyleClass().add("grid-pane");
+        gridPane.getStyleClass().add("grid-pane");
         ColumnConstraints cConstraints = new ColumnConstraints();
         cConstraints.setHalignment(HPos.CENTER);
         cConstraints.setHgrow(Priority.ALWAYS);
@@ -213,7 +213,7 @@ public class Login extends Application{
 		}
         mapStagePane = makeScene(primaryStage);
         Scene scene = new Scene(mapStagePane.get(primaryStage), 500, 500);
-      //a  scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
+        scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
