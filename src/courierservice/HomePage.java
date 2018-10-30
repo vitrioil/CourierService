@@ -495,7 +495,6 @@ public class HomePage extends Application {
             Make grid for the history tab
         */
         GridPane gPane = sampleGridPane();
-        gPane.getStyleClass().add("grid-pane");
 
         Label labelHistory = new Label("Check your history of couriers here!");
         
@@ -517,17 +516,17 @@ public class HomePage extends Application {
                 }
             }
         });
-        listViewOrder.setPrefSize(500, 200);
+        listViewOrder.setPrefSize(800, 600);
 
         JFXButton buttonGetDetails = new JFXButton("Find");        
         JFXButton buttonRefresh = new JFXButton("Refresh");        
         
         //Flow pane is used here for the drawer pane (slider)
-        FlowPane flowPane = new FlowPane();
-        flowPane.setHgap(10);
+        VBox flowPane = new VBox();
+        flowPane.setStyle("-fx-background-color:linear-gradient(#141a2e,#021e20);");
         
         flowPane.getChildren().addAll(labelHistory, listViewOrder, buttonGetDetails, buttonRefresh);
-        flowPane.setMaxSize(200, 200);
+      //  flowPane.setMaxSize(Dou, 200);
         
         JFXDrawer rightDrawer = new JFXDrawer();
         StackPane rightDrawerPane = new StackPane();
@@ -540,6 +539,8 @@ public class HomePage extends Application {
         rightDrawer.setResizableOnDrag(true);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
+        drawersStack.setStyle("-fx-background-color:linear-gradient(#141a2e,#021e20);");
+        
         drawersStack.setContent(flowPane);
         
         buttonGetDetails.setOnAction(e -> {
@@ -565,7 +566,7 @@ public class HomePage extends Application {
         
         gPane.getChildren().addAll(drawersStack);
 
-        history.setContent(gPane);
+        history.setContent(drawersStack);
     }
         
     private ArrayList<String> getLocation(Order order)
@@ -801,7 +802,7 @@ public class HomePage extends Application {
         AnchorPane.setLeftAnchor(tabPane, 1.0);
         AnchorPane.setBottomAnchor(tabPane, 1.0);
 
-        anchorPane.getChildren().addAll(tabPane, buttonSettings, comboBoxNotifications);
+        anchorPane.getChildren().addAll(tabPane, buttonSettings);
         
 	// Add the settings drawer
         JFXDrawer rightDrawerSettings = new JFXDrawer();

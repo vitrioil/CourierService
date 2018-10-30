@@ -84,6 +84,20 @@ public class Tracking {
                 e.printStackTrace();
             }
         }
+        
+        public void updatePayment()
+        {
+            try{
+                String query = "update Orders set assigned = 0 , paid = 1 where orderid = ?";
+                myStmt=this.myConn.prepareStatement(query);
+                myStmt.setInt(1, this.getOrderid());
+                myStmt.executeUpdate();
+            }
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
         public boolean isReached() {
             return reached;

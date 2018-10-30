@@ -113,6 +113,7 @@ public class Login extends Application{
         //borderPane.setPadding(new Insets(100, 100, 100, 100));
 
         GridPane gridPane = new GridPane();
+        gridPane.getStyleClass().add("grid-pane");
         ColumnConstraints cConstraints = new ColumnConstraints();
         cConstraints.setHalignment(HPos.CENTER);
         cConstraints.setHgrow(Priority.ALWAYS);
@@ -121,7 +122,7 @@ public class Login extends Application{
         gridPane.setVgap(10);
 
         Label label = new Label("Courier Services");
-        label.setStyle("-fx-background-color: #003333; -fx-text-fill: white");
+        label.setStyle("-fx-background-color: #141a2e; -fx-text-fill: white");
         label.setPrefSize(2000, 50);
         label.setAlignment(Pos.CENTER);
         label.setMaxWidth(Double.MAX_VALUE);

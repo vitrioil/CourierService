@@ -58,7 +58,6 @@ public class HomePageEmp extends Application{
     Tab updateShipment, pendingPayment;
     
     int intMaxCharLimit = 200;
-    
         
     public static GridPane sampleGridPane()
     {
@@ -159,6 +158,10 @@ public class HomePageEmp extends Application{
                     tracking.setEmployeeid(primaryEmployee.getEmployeeid());
                     tracking.setReached(reached);
                     tracking.updateTracking();
+                    if(reached)
+                    {
+                        tracking.updatePayment();
+                    }
                 }
                 
         });
@@ -191,8 +194,10 @@ public class HomePageEmp extends Application{
         GridPane gridPane = sampleGridPane();
         
         JFXTreeTableColumn<Payment, String> tableColumnOrderID = new JFXTreeTableColumn<>("Order ID");
-        tableColumnOrderID.setPrefWidth(300);
-        tableColumnOrderID.setStyle("-fx-background-color: black;-fx-text-fill:white");
+        //tableColumnOrderID.setPrefWidth(320);
+        tableColumnOrderID.setStyle("-fx-background-color: linear-gradient(#141a2e,#021e20);-fx-text-fill:white;"
+                       + "-fx-border-color: linear-gradient(#141a2e,#021e20);"
+                + "-fx-table-cell-border-color: linear-gradient(#141a2e,#021e20);");
         tableColumnOrderID.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
                 if (tableColumnOrderID.validateValue(param)) {
                     return param.getValue().getValue().orderID;
@@ -202,8 +207,10 @@ public class HomePageEmp extends Application{
         });
 
         JFXTreeTableColumn<Payment, String> tableColumnPrice = new JFXTreeTableColumn<>("Price");
-        tableColumnPrice.setPrefWidth(300);
-        tableColumnPrice.setStyle("-fx-background-color: black;-fx-text-fill:white");
+        //tableColumnPrice.setPrefWidth(320);
+        tableColumnPrice.setStyle("-fx-background-color: linear-gradient(#141a2e,#021e20);-fx-text-fill:white;"
+                       + "-fx-border-color: linear-gradient(#141a2e,#021e20);"
+                + "-fx-table-cell-border-color: linear-gradient(#141a2e,#021e20);");
         tableColumnPrice.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
             if (tableColumnPrice.validateValue(param)) {
                 return param.getValue().getValue().price;
@@ -213,8 +220,10 @@ public class HomePageEmp extends Application{
         });
         
         JFXTreeTableColumn<Payment, String> tableColumnTime = new JFXTreeTableColumn<>("Time");
-        tableColumnTime.setPrefWidth(300);
-        tableColumnTime.setStyle("-fx-background-color: black;-fx-text-fill:white");
+        //tableColumnTime.setPrefWidth(320);
+        tableColumnTime.setStyle("-fx-background-color: linear-gradient(#141a2e,#021e20);-fx-text-fill:white;"
+                       + "-fx-border-color: linear-gradient(#141a2e,#021e20);"
+                + "-fx-table-cell-border-color: linear-gradient(#141a2e,#021e20);");
         tableColumnTime.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
                 if (tableColumnTime.validateValue(param)) {
                     return param.getValue().getValue().time;
@@ -224,8 +233,10 @@ public class HomePageEmp extends Application{
         });
 
         JFXTreeTableColumn<Payment, String> tableColumnCustomerID = new JFXTreeTableColumn<>("Customer ID");
-        tableColumnCustomerID.setPrefWidth(300);
-        tableColumnCustomerID.setStyle("-fx-background-color: black;-fx-text-fill:white");
+        //tableColumnCustomerID.setPrefWidth(320);
+        tableColumnCustomerID.setStyle("-fx-background-color: linear-gradient(#141a2e,#021e20);-fx-text-fill:white;"
+                       + "-fx-border-color: linear-gradient(#141a2e,#021e20);"
+                + "-fx-table-cell-border-color: linear-gradient(#141a2e,#021e20);");
         tableColumnCustomerID.setCellValueFactory( (TreeTableColumn.CellDataFeatures<Payment, String> param) -> {
             if (tableColumnCustomerID.validateValue(param)) {
                 return param.getValue().getValue().customerID;
@@ -237,9 +248,17 @@ public class HomePageEmp extends Application{
         TreeItem<Payment> root = new RecursiveTreeItem<Payment>(getPendingPayment(), RecursiveTreeObject::getChildren);
         
         JFXTreeTableView<Payment> tablePayment = new JFXTreeTableView<>(root);
+        tablePayment.setStyle("-fx-background-color: linear-gradient(#141a2e,#021e20);"
+                + "-fx-border-color: transparent;"
+                + "-fx-table-cell-border-color: linear-gradient(#141a2e,#021e20);");
+        
         tablePayment.setPadding(new Insets(10, 10, 10, 10));
-        tablePayment.setPrefWidth(500);
+        
         tablePayment.getColumns().setAll(tableColumnOrderID, tableColumnPrice, tableColumnTime, tableColumnCustomerID);
+        tableColumnOrderID.prefWidthProperty().bind(tablePayment.widthProperty().divide(4)); // w * 1/4
+        tableColumnPrice.prefWidthProperty().bind(tablePayment.widthProperty().divide(4)); // w * 1/2
+        tableColumnTime.prefWidthProperty().bind(tablePayment.widthProperty().divide(4)); // w * 1/4
+        tableColumnCustomerID.prefWidthProperty().bind(tablePayment.widthProperty().divide(4)); // w * 1/4
         tablePayment.setShowRoot(false);
         tablePayment.setEditable(false);
         
@@ -365,6 +384,7 @@ public class HomePageEmp extends Application{
     @Override
     public void start(Stage stage) { 
         primaryStage = stage;
+        
         borderPane = makeScene(primaryStage, primaryEmployee, primaryConn);
         Scene scene = new Scene(borderPane, 500, 500);
         scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());

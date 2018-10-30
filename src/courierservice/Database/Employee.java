@@ -134,8 +134,17 @@ public class Employee {
             e.printStackTrace();
         }
         return listPayment;
-    }
-        
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+
 	public int getEmployeeid() {
 		return employeeid;
 	}

@@ -1,3 +1,4 @@
+
 package courierservice.Database;
 
 import java.sql.Connection;
@@ -10,13 +11,21 @@ public class Order {
 	static Connection myConn;
 	static PreparedStatement myStmt;
 	
-	private int orderid;
+	private int orderid,price,userid;
 	private String source,destination,deliveryType,details,orderName;
 
         
 	private Time pickupTime;
         
         private boolean assigned=false,delivered=false,paid=false;
+        
+        private int fragileCount,durableCount,otherCount;
+
+        
+
+        public void setOtherCount(int otherCount) {
+            this.otherCount = otherCount;
+        }
         
 	public Order(Connection myConn) {
 		this.myConn=myConn;
@@ -29,13 +38,25 @@ public class Order {
 		this.setDeliveryType(deliveryType);this.setDetails(details);this.setOrderName(OrderName);
 	}
 	
+                public Order(String source,String destination,String deliveryType,String details, Connection myConn) {
+                  this(myConn);setPrice(0);
+                  //System.out.println("isDelivered: "+this.isDeliverd); 
+                  //this.isDeliverd=false;this.setIsAssigned(false);this.setIsPaid(false);
+                  this.setSource(source);this.setDestination(destination);
+                  this.setDeliveryType(deliveryType);this.setDetails(details);
+  
+                  /* query to count the 3 types of objects */
+                  setFragileCount(0);setDurableCount(1);setOtherCount(0);
+  
+          }
+        
 	public boolean insertOrder(int userid) {
                 int orderid = getMaxOrderID() + 1;
                 this.setOrderid(orderid);
 		try {
 			myStmt = myConn.prepareStatement("insert into Orders (userid, orderid, destination,source,"
-                                + "deliverytype,details,pickuptime,ordername)" 
-					+ "values (?,?,?,?,?,?,?,?)" );
+                                + "deliverytype,details,pickuptime,ordername,assigned)" 
+					+ "values (?,?,?,?,?,?,?,?,?)" );
 			myStmt.setInt(1, userid);
 			myStmt.setInt(2, this.getOrderid());
 			myStmt.setString(3, this.getDestination());
@@ -44,6 +65,7 @@ public class Order {
 			myStmt.setString(6, this.getDetails());
 			myStmt.setTime(7, this.getPickupTime());
 			myStmt.setString(8, this.getOrderName());
+			myStmt.setBoolean(9, false);
 			myStmt.executeUpdate();
                         
                         myStmt = myConn.prepareStatement("insert into userhistory (userid, orderid, price)" 
@@ -103,30 +125,36 @@ public class Order {
             }
             return price;
         }
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
         
-	/*public Order(String email,String password) {
-		/*convert password string to hash pass here 
-		ResultSet myRs;
-		try {
-			String query="select * from users where username = ? and password = ?";
-			myStmt=myConn.prepareStatement(query);
-			myStmt.setString(1, email);
-			myStmt.setString(2, password);
-			myRs = myStmt.executeQuery();
-			while(myRs.next() ) {
-				this.userid=(int)myRs.getLong("userid");
-				this.username=myRs.getString("username");
-				this.email=myRs.getString("email");
-				this.password=myRs.getString("password");
-				this.sourceAddress=myRs.getString("sourceaddress");
-				this.phone=myRs.getString("phone") ;
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
-       
+	
+	
+       public int getFragileCount() {
+            return fragileCount;
+        }
+
+        public void setFragileCount(int fragileCount) {
+            this.fragileCount = fragileCount;
+        }
+
+        public int getDurableCount() {
+            return durableCount;
+        }
+
+        public void setDurableCount(int durableCount) {
+            this.durableCount = durableCount;
+        }
+
+        public int getOtherCount() {
+            return otherCount;
+        }
         public String getOrderName() {
             return orderName;
         }
@@ -203,5 +231,9 @@ public class Order {
 
         public void setPaid(boolean paid) {
             this.paid = paid;
+        }
+        
+        public void setPrice(int price){
+            this.price = price;
         }
 }

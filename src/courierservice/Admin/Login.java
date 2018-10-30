@@ -3,19 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package courierservice.Employee;
+package courierservice.Admin;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXPopup;
 import com.jfoenix.controls.JFXTextField;
-import courierservice.Database.Employee;
-import courierservice.Database.UserNotFoundException;
 import courierservice.HomePage;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.geometry.HPos;
@@ -35,7 +34,7 @@ import javafx.stage.Stage;
  *
  * @author vitrioil
  */
-public class LoginEmp extends Application{
+public class Login extends Application{
     
     Tab login;
     //Similar to homepage create a borderpane that stores the layout
@@ -44,62 +43,53 @@ public class LoginEmp extends Application{
     Stage primaryStage;
     //Hashmap to pass mapping from stage to borderpane
     HashMap<Stage, BorderPane> mapStagePane = new HashMap<Stage, BorderPane>();
+    public Connection primaryConn;
     
-    JFXTextField textFieldEmail;
+    JFXTextField textFieldUserName;
     JFXPasswordField textFieldPassword;
     JFXButton buttonLogin;
     JFXButton buttonSign;
     JFXButton buttonExit;
-    
-    Connection primaryConn;
-    
-    String urlConn="jdbc:mysql://localhost:3306/Courier";
-    String userConn="vitrioil";
-    String passwordConn="vitrioil";
-    
-    String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+ 
-                            "[a-zA-Z0-9_+&*-]+)*@" + 
-                            "(?:[a-zA-Z0-9-]+\\.)+[a-z" + 
-                            "A-Z]{2,7}$";
-    Pattern  pattern = Pattern.compile(emailRegex);
-
             
     static JFXPopup showPopup(String message)
     {
         GridPane gridPane = new GridPane();
         Label labelMessage = new Label(message);
         gridPane.add(labelMessage, 0, 0);
-        gridPane.setStyle("-fx-background-color: red;");
         JFXPopup popup = new JFXPopup(gridPane);
         return popup;
     }
     
-    boolean verifyLogin(String userEmail, String password)
+    boolean verifyLogin()
     {
-        System.out.println("Username:"+userEmail+" welcome");
-        if(!pattern.matcher(userEmail).matches())
-        {
-            JFXPopup popup = showPopup("Invalid email address");
-            popup.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
-            return false;
-        }
-        if (userEmail.trim().isEmpty())
+        String userName = textFieldUserName.getText();
+        System.out.println("Username:"+userName+" welcome");
+        if (userName.trim().isEmpty())
         {
             JFXPopup popup = showPopup("No user name entered");
-            popup.show(textFieldEmail, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
+            popup.show(textFieldUserName, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
             return false;
         }
+        String password = textFieldPassword.getText();
         if(password.trim().isEmpty())
         {
           JFXPopup popup = showPopup("Please enter password");
           popup.show(textFieldPassword, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
           return false;
         }
+        /*
+ 			=====================
+			Database support here
+			=====================
+                          verify
+        */
         return true;
     }
     
     public HashMap<Stage, BorderPane>  makeScene(Stage newStage)
     {
+    	
+    	
     	/*
 		Make scene is used to create the scene 
 		and pass the borderpane
@@ -111,7 +101,7 @@ public class LoginEmp extends Application{
         //borderPane.setPadding(new Insets(100, 100, 100, 100));
 
         GridPane gridPane = new GridPane();
-        gridPane.getStyleClass().add("grid-pane");
+        //gridPane.getStyleClass().add("grid-pane");
         ColumnConstraints cConstraints = new ColumnConstraints();
         cConstraints.setHalignment(HPos.CENTER);
         cConstraints.setHgrow(Priority.ALWAYS);
@@ -119,8 +109,8 @@ public class LoginEmp extends Application{
         gridPane.setPadding(new Insets(100, 100, 100, 100));     
         gridPane.setVgap(10);
 
-        Label label = new Label("Courier Services::Employee");
-        label.setStyle("-fx-background-color: #141a2e; -fx-text-fill: white");
+        Label label = new Label("Courier Services::Admin");
+        label.setStyle("-fx-background-color: #003333; -fx-text-fill: white");
         label.setPrefSize(2000, 50);
         label.setAlignment(Pos.CENTER);
         label.setMaxWidth(Double.MAX_VALUE);
@@ -128,44 +118,46 @@ public class LoginEmp extends Application{
         Label labelLogin = new Label("Log in");
         labelLogin.setMaxWidth(Double.MAX_VALUE);
         
-        textFieldEmail = new JFXTextField();
-        textFieldEmail.setPromptText("Email");
-        textFieldEmail.setMaxWidth(Double.MAX_VALUE);
+        textFieldUserName = new JFXTextField();
+        textFieldUserName.setPromptText("User Name");
+        textFieldUserName.setMaxWidth(Double.MAX_VALUE);
         
         textFieldPassword = new JFXPasswordField();
         textFieldPassword.setPromptText("Password");
         
         buttonLogin = new JFXButton("Log in");
+        buttonSign = new JFXButton("Sign Up");
         
         buttonExit = new JFXButton("Exit");
         
         buttonLogin.setOnAction( e -> {
-                String employeeEmail = textFieldEmail.getText();
-                String employeePassword = textFieldPassword.getText();
-                boolean loginEnter = verifyLogin(employeeEmail, employeePassword);
+                //Add validation here
+		/*
+			=====================
+			Database support here
+			=====================
+		*/
+                boolean loginEnter = verifyLogin();
                 
                 // verify password
                 if (loginEnter)
                 {
-                    Employee employee;
-                    try{
-                        employee = new Employee(employeeEmail, employeePassword, primaryConn);
-                        HomePageEmp homePage = new HomePageEmp();
-                        primaryStage.getScene().setRoot(homePage.makeScene(primaryStage, employee, primaryConn));
-                    }
-                    catch(UserNotFoundException uExc)
-                    {
-                        JFXPopup errPopup = showPopup(uExc.getMessage());
-                        errPopup.show(textFieldEmail,  JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT);
-                    }
-                    catch(Exception exc){
-                        exc.printStackTrace();
-                    }
-                    
+                    HomePageAdmin homePageAdmin = new HomePageAdmin();
+                    primaryStage.getScene().setRoot(homePageAdmin.makeScene(newStage,primaryConn));
                 }
                 
         });
         
+        buttonSign.setOnAction( e -> {
+		/*
+			=====================
+			Database support here
+			=====================
+		*/
+              //  SignUp reg = new SignUp();
+                //primaryStage.getScene().setRoot(reg.makeScene(newStage));
+
+        });
         buttonExit.setOnAction(e-> {
             Stage stage = (Stage) buttonExit.getScene().getWindow();
             stage.close();
@@ -174,12 +166,14 @@ public class LoginEmp extends Application{
         VBox vBox = new VBox();
         vBox.setSpacing(10);
         
-        VBox.setVgrow(textFieldEmail, Priority.ALWAYS);
+        VBox.setVgrow(textFieldUserName, Priority.ALWAYS);
         VBox.setVgrow(textFieldPassword, Priority.ALWAYS);
         VBox.setVgrow(buttonLogin, Priority.ALWAYS);
+        VBox.setVgrow(buttonSign, Priority.ALWAYS);
         
-        vBox.getChildren().addAll(labelLogin,
-                    textFieldEmail,
+        vBox.getChildren().addAll(
+                    labelLogin,
+                    textFieldUserName,
                     textFieldPassword,
                     buttonLogin
         );
@@ -195,16 +189,31 @@ public class LoginEmp extends Application{
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
-        try{
-            Class.forName("org.mariadb.jdbc.Driver");
-            primaryConn=DriverManager.getConnection(urlConn,userConn,passwordConn);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        String url="jdbc:mysql://localhost:3306/Courier";
+		String user="vitrioil";
+		String password="vitrioil";
+		
+		try {
+		    //Class.forName("org.mariadb.jdbc.driver");   
+		    primaryConn=DriverManager.getConnection(url,user,password);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(primaryConn==null) {
+			System.out.println("primaryConn is null");
+		}else {
+			System.out.println("primaryConn is not null");
+		}
+        try {
+			primaryConn=DriverManager.getConnection(url,user,password);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         mapStagePane = makeScene(primaryStage);
         Scene scene = new Scene(mapStagePane.get(primaryStage), 500, 500);
-        scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
+      //a  scene.getStylesheets().add(HomePage.class.getResource("HomePage.css").toExternalForm());
 
         primaryStage.setScene(scene);
         primaryStage.show();
